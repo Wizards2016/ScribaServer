@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "grunt test"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,20 @@
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "mysql": "^2.12.0",
-    "sequelize": "^3.28.0"
+    "sequelize": "^3.28.0",
+    "typescript": "^2.1.4"
+  },
+  "devDependencies": {
+    "eslint-config-airbnb": "^13.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
+    "eslint-plugin-react": "^6.8.0",
+    "grunt": "^1.0.1",
+    "grunt-cli": "^1.2.0",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-eslint": "^19.0.0",
+    "grunt-ts": "^6.0.0-beta.3",
+    "grunt-tslint": "^4.0.0",
+    "tslint": "^4.1.1"
   }
 }

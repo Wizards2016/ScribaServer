@@ -1,24 +1,24 @@
-var db = require ('../db');
+const db = require('../db');
 
 module.exports = {
   messages: {
-    get: function (req, res){
+    get: function (req, res) {
       console.log('get req: ', req.query);
       db.Message.findAll({})
-      .then(function(data){
+      .then((data) => {
         console.log('data: ', data);
         res.json(data);
       })
-      .catch(function(error){
+      .catch((error) => {
         console.log('error: ', error);
       });
     },
-    post: function (req, res){
+    post: function (req, res) {
       console.log('post req: ', req.body);
       db.Message.create({
         text: req.body.text
       })
-      .then(function(data){
+      .then(() => {
         res.sendStatus(201);
       });
     }
