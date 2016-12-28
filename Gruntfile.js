@@ -5,16 +5,16 @@ module.exports = function (grunt) {
       options: {
         configFile: '.eslintrc'
       },
-      target: ['**/*.js', '!Gruntfile.js']
+      target: ['**/*.js', '!Gruntfile.js', '!node_modules/**/*.js']
     },
     tslint: {
       files: {
-        src: ['**/*.ts']
+        src: ['**/*.ts', '!node_modules/*', '!node_modules/**/*.ts']
       }
     },
     watch: {
       scripts: {
-        files: ['**/*.js', '**/*.ts', '!Gruntfile.js'],
+        files: ['**/*.js', '**/*.ts', '!Gruntfile.js', '!node_modules/**/*.js', '!node_modules/**/*.ts'],
         tasks: ['eslint', 'tslint']
       }
     }

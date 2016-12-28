@@ -1,8 +1,7 @@
-var Sequelize = require('sequelize');
-var db = new Sequelize('scribedb', 'root', '');
+const Sequelize = require('sequelize');
+const db = new Sequelize('scribedb', 'root', '');
 
-
-var Message = db.define('Message', {
+const Message = db.define('Message', {
   text: Sequelize.STRING
 });
 
