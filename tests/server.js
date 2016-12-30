@@ -20,7 +20,7 @@ describe('Server and database', () => {
     });
 
     dbConnection.connect();
-    const tablename = 'truncate messages';
+    const tablename = 'truncate Messages';
 
     // Empty the db table before each test so that multiple tests won't screw each other up
     dbConnection.query(tablename, done);
