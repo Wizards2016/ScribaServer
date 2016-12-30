@@ -5,3 +5,5 @@ install:
   - npm install
 services:
   - mysql
+before_script:
+  - mysql -e 'create database scribedb;'

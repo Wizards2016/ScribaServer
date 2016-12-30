@@ -11,10 +11,12 @@ describe('Server and database', () => {
   let dbConnection;
 
   beforeEach((done) => {
+    // If running in the terminal:
+    // start mysql server and use scribedb database
     dbConnection = mysql.createConnection({
       user: 'root',
       password: '',
-      database: 'scribeDB'
+      database: 'scribedb'
     });
 
     dbConnection.connect();
