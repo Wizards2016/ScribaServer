@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "start": "mocha tests/server.js"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,7 @@
     "typescript": "^2.1.4"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
     "eslint-config-airbnb": "^13.0.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^2.2.3",
@@ -34,6 +36,8 @@
     "grunt-eslint": "^19.0.0",
     "grunt-ts": "^6.0.0-beta.3",
     "grunt-tslint": "^4.0.0",
+    "mocha": "^3.2.0",
+    "request": "^2.79.0",
     "tslint": "^4.1.1"
   }
 }
