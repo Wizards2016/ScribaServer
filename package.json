@@ -18,22 +18,24 @@
   },
   "homepage": "https://github.com/StephenOm/Scribe-Server#readme",
   "dependencies": {
+    "chai": "^3.5.0",
+    "request": "^2.79.0",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "mysql": "^2.12.0",
     "sequelize": "^3.28.0"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
     "eslint-config-airbnb": "^13.0.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^2.2.3",
     "eslint-plugin-react": "^6.8.0",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
+    "grunt-concurrent": "^2.3.1",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-eslint": "^19.0.0",
-    "mocha": "^3.2.0",
-    "request": "^2.79.0"
+    "grunt-nodemon": "^0.4.2",
+    "mocha": "^3.2.0"
   }
 }

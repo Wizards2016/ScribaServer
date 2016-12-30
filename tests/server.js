@@ -2,7 +2,10 @@ const mysql = require('mysql');
 const request = require('request');
 const expect = require('chai').expect;
 const assert = require('chai').assert;
+
 const baseUrl = 'http://127.0.0.1:8000';
+// Start the server
+require('../server.js');
 
 describe('Server and database', () => {
   let dbConnection;
