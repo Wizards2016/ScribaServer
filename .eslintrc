@@ -4,5 +4,8 @@
     "comma-dangle": ["error", "never"],
     "import/newline-after-import": 0,
     "object-shorthand": ['error', 'consistent']
+  },
+  "env": {
+    "jasmine": true
   }
 }

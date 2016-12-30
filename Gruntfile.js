@@ -17,6 +17,15 @@ module.exports = function (grunt) {
         files: ['**/*.js', '**/*.ts', '!Gruntfile.js', '!node_modules/**/*.js', '!node_modules/**/*.ts'],
         tasks: ['eslint', 'tslint']
       }
+    },
+    mochaTest: {
+      test: {
+        options: {
+          reporter: 'spec',
+          noFail: false
+        },
+        src: ['tests/**/*.js']
+      }
     }
   });
 
@@ -24,7 +33,9 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-eslint');
   grunt.loadNpmTasks('grunt-tslint');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-mocha-test');
   // additional tasks
   grunt.registerTask('default', ['eslint', 'tslint', 'watch']);
-  grunt.registerTask('test', ['eslint', 'tslint']);
+  grunt.registerTask('lint', ['eslint', 'tslint']);
+  grunt.registerTask('test', ['eslint', 'tslint', 'mochaTest']);
 };
