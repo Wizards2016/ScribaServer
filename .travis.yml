@@ -7,4 +7,5 @@ services:
   - mysql
 before_script:
   - mysql -e 'create database scribedb;'
+  - mysql -e 'use scribedb'
   - mysql -e 'create table Messages (text VARCHAR(255))';
