@@ -7,24 +7,33 @@ module.exports = function (grunt) {
       },
       target: ['**/*.js', '!Gruntfile.js', '!node_modules/**/*.js']
     },
-    tslint: {
-      files: {
-        src: ['**/*.ts', '!node_modules/*', '!node_modules/**/*.ts']
+    mochaTest: {
+      test: {
+        options: {
+          reporter: 'spec',
+          noFail: false
+        },
+        src: ['tests/**/*.js']
       }
     },
-    watch: {
-      scripts: {
-        files: ['**/*.js', '**/*.ts', '!Gruntfile.js', '!node_modules/**/*.js', '!node_modules/**/*.ts'],
-        tasks: ['eslint', 'tslint']
+    nodemon: {
+      dev: {
+        script: 'server.js'
       }
     }
   });
 
   // loading modules
   grunt.loadNpmTasks('grunt-eslint');
-  grunt.loadNpmTasks('grunt-tslint');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-mocha-test');
+  grunt.loadNpmTasks('grunt-nodemon');
   // additional tasks
-  grunt.registerTask('default', ['eslint', 'tslint', 'watch']);
-  grunt.registerTask('test', ['eslint', 'tslint']);
+  grunt.registerTask('default', () => {
+    grunt.log.write(`Options:
+                    grunt lint: Run eslint
+                    grunt test: Run eslint, run server and database tests`);
+  });
+  grunt.registerTask('lint', ['eslint']);
+  grunt.registerTask('test', ['eslint', 'mochaTest']);
 };

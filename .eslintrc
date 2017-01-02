@@ -3,6 +3,10 @@
   "rules": {
     "comma-dangle": ["error", "never"],
     "import/newline-after-import": 0,
-    "object-shorthand": ['error', 'consistent']
+    "object-shorthand": ['error', 'consistent'],
+    "no-shadow": ["error", { "hoist": "functions", "allow": ["response"] }]
+  },
+  "env": {
+    "jasmine": true
   }
 }
