@@ -18,7 +18,7 @@ module.exports = {
           }
         })
         .then((data) => {
-          console.log('data: ', data);
+          // console.log('data: ', data);
           res.json(data);
         })
         .catch((error) => {
@@ -27,7 +27,7 @@ module.exports = {
       } else {
         db.Message.findAll({}) // find all with no query.
         .then((data) => {
-          console.log('data: ', data);
+          // console.log('data: ', data);
           res.json(data);
         })
         .catch((error) => {
