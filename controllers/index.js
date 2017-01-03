@@ -6,7 +6,6 @@ module.exports = {
       console.log('get req: ', req.query);
       db.Message.findAll({})
       .then((data) => {
-        console.log('data: ', data);
         res.json(data);
       })
       .catch((error) => {
@@ -14,13 +13,16 @@ module.exports = {
       });
     },
     post: function (req, res) {
-      console.log('post req: ', req.body);
-      db.Message.create({
-        text: req.body.text
-      })
-      .then(() => {
-        res.sendStatus(201);
-      });
+      if (req.body.text.length < 1) {
+        res.sendStatus(406);
+      } else {
+        db.Message.create({
+          text: req.body.text
+        })
+        .then(() => {
+          res.sendStatus(201);
+        });
+      }
     }
   }
 };
