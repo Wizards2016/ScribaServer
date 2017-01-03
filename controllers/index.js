@@ -13,7 +13,7 @@ module.exports = {
       });
     },
     post: function (req, res) {
-      if(req.body.text.length < 1) {
+      if (req.body.text.length < 1) {
         res.sendStatus(406);
       } else {
         db.Message.create({
