@@ -37,9 +37,27 @@ describe('Server and database', () => {
     request({
       method: 'POST',
       url: `${baseUrl}/messages`,
-      json: { text: 'A testing message' }
+      json: { text: 'test #1' }
     }, (err, response) => {
       expect(response.statusCode).to.equal(201);
+    });
+    request({
+      method: 'POST',
+      url: `${baseUrl}/messages`,
+      json: { text: 'test #2' }
+    }, (err, response) => {
+      expect(response.statusCode).to.equal(201);
+      done();
+    });
+  });
+
+  it('should not post an empty message to the database', (done) => {
+    request({
+      method: 'POST',
+      url: `${baseUrl}/messages`,
+      json: { text: '' }
+    }, (err, response) => {
+      expect(response.statusCode).to.equal(406);
       done();
     });
   });
@@ -48,14 +66,28 @@ describe('Server and database', () => {
     request({
       method: 'POST',
       url: `${baseUrl}/messages`,
-      json: { text: 'A testing message' }
+      json: { text: 'Test #1' }
     }, (err1, response) => {
       expect(response.statusCode).to.equal(201);
       request({
         method: 'GET',
         url: `${baseUrl}/messages`
       }, (err2, response) => {
-        expect(JSON.parse(response.body)[0].text).to.equal('A testing message');
+        expect(JSON.parse(response.body)[0].text).to.equal('Test #1');
+      });
+    });
+
+    request({
+      method: 'POST',
+      url: `${baseUrl}/messages`,
+      json: { text: 'Test #2' }
+    }, (err1, response) => {
+      expect(response.statusCode).to.equal(201);
+      request({
+        method: 'GET',
+        url: `${baseUrl}/messages`
+      }, (err2, response) => {
+        expect(JSON.parse(response.body)[1].text).to.equal('Test #2');
         done();
       });
     });
