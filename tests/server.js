@@ -92,4 +92,39 @@ describe('Server and database', () => {
       });
     });
   });
+
+  it('should get a specific message from the database', (done) => {
+    request({
+      method: 'POST',
+      url: `${baseUrl}/messages`,
+      json: { text: 'Test #1', latitude: '37', longitude: '-100' }
+    }, (err1, response) => {
+      expect(response.statusCode).to.equal(201);
+      request({
+        method: 'GET',
+        url: `${baseUrl}/messages`,
+        json: { latitude: '37', longitude: '-100' }
+      }, (err2, response) => {
+        expect(response.body[0].latitude).to.equal(37);
+        expect(response.body[0].longitude).to.equal(-100);
+      });
+    });
+
+    request({
+      method: 'POST',
+      url: `${baseUrl}/messages`,
+      json: { text: 'Test #1', latitude: '40.7128', longitude: '74.0059' }
+    }, (err1, response) => {
+      expect(response.statusCode).to.equal(201);
+      request({
+        method: 'GET',
+        url: `${baseUrl}/messages`,
+        json: { latitude: '40.7128', longitude: '74.0059' }
+      }, (err2, response) => {
+        expect(response.body[1].latitude).to.equal(40.7128);
+        expect(response.body[1].longitude).to.equal(74.0059);
+        done();
+      });
+    });
+  });
 });
