@@ -44,7 +44,7 @@ module.exports = {
           text: req.body.text,
           latitude: req.body.latitude,
           longitude: req.body.longitude,
-          userId: req.body.userId
+          userAuth: req.body.userAuth
         })
         .then(() => {
           res.sendStatus(201);
