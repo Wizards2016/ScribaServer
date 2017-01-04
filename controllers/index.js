@@ -43,7 +43,8 @@ module.exports = {
         db.Message.create({
           text: req.body.text,
           latitude: req.body.latitude,
-          longitude: req.body.longitude
+          longitude: req.body.longitude,
+          userId: req.body.userId
         })
         .then(() => {
           res.sendStatus(201);

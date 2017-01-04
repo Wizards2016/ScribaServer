@@ -5,8 +5,9 @@ const Message = db.define('Message', {
   text: Sequelize.STRING,
   // location
   latitude: Sequelize.DOUBLE(12, 7),
-  longitude: Sequelize.DOUBLE(12, 7)
+  longitude: Sequelize.DOUBLE(12, 7),
   // user
+  userId: Sequelize.STRING
   // catagory
   // sub-catagory
   // vote up
