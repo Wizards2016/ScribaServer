@@ -7,7 +7,7 @@ module.exports = {
       if (req.query.latitude && req.query.longitude) { // whereas here has query
         const latitude = parseFloat(req.query.latitude);
         const longitude = parseFloat(req.query.longitude);
-        db.Message.findAll({
+        db.Messages.findAll({
           where: {
             latitude: {
               $between: [latitude - 1, latitude + 1]
@@ -25,7 +25,7 @@ module.exports = {
           console.log('error: ', error);
         });
       } else {
-        db.Message.findAll({}) // find all with no query.
+        db.Messages.findAll({}) // find all with no query.
         .then((data) => {
           // console.log('data: ', data);
           res.json(data);
@@ -40,7 +40,7 @@ module.exports = {
       if (req.body.text.length < 1) {
         res.sendStatus(406);
       } else {
-        db.Message.create({
+        db.Messages.create({
           text: req.body.text,
           latitude: req.body.latitude,
           longitude: req.body.longitude,

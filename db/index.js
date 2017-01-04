@@ -1,30 +1,41 @@
 const Sequelize = require('sequelize');
 const db = new Sequelize('scribedb', 'root', '');
 
-const Message = db.define('Message', {
+const Messages = db.define('Messages', {
   text: Sequelize.STRING,
   // location
   latitude: Sequelize.DOUBLE(12, 7),
   longitude: Sequelize.DOUBLE(12, 7),
   // user
-  userId: Sequelize.STRING
-  // catagory
-  // sub-catagory
-  // vote up
-  // votes down
+  userAuth: Sequelize.STRING,
+  catagory: Sequelize.STRING,
+  subCatagory: Sequelize.STRING,
+  upVotes: Sequelize.INTEGER,
+  downVotes: Sequelize.INTEGER
+
 });
 
 const Users = db.define('Users', {
-  // display username
-  // unique login userId
-  text: Sequelize.STRING
+  displayName: Sequelize.STRING,
+  loginId: {
+    type: Sequelize.STRING,
+    unique: true
+  }
+  // total votes
 });
 
-// Message.belongsTo(User);
-// User.hasMany(message);
+const Votes = db.define('Votes', {
+  voteUp: Sequelize.BOOLEAN,
+  voteDown: Sequelize.BOOLEAN
+  //foreign key message
+  //foreign key who voted userId
+});
 
-Message.sync();
+Messages.belongsTo(Users);
+Users.hasMany(Messages);
+
+Messages.sync();
 Users.sync();
 
-exports.Message = Message;
+exports.Messages = Messages;
 exports.Users = Users;
