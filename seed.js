@@ -2,30 +2,30 @@ var db = require('./db/index.js');
 var Messages = db.Messages;
 
 db.Messages.create({
-  text: 'Free couch',
-  latitude: 37.3344314,
-  longitude: -122.0336186,
+  text: 'Is the earth round?',
+  latitude: 37.3343314,
+  longitude: -122.0332186,
   userAuth: 'Thomas Cruise'
 })
 .then(function () {
   return db.Messages.create({
-  text: 'Lost my dog :\\',
+  text: 'When were dogs?',
   latitude: 37.3323314,
-  longitude: -122.0333786,
+  longitude: -122.0332186,
   userAuth: 'Thomas Cruise'
   });
 })
 .then(function () {
   return db.Messages.create({
-  text: 'Dog found',
-  latitude: 37.3303316,
-  longitude: -122.0332196,
+  text: 'Is it?',
+  latitude: 37.3303314,
+  longitude: -122.0332186,
   userAuth: 'Thomas Cruise'
   });
 })
 .then(function () {
   return db.Messages.create({
-  text: 'Yard Sale!',
+  text: 'This was the second best',
   latitude: 37.3323314,
   longitude: -122.0342186,
   userAuth: 'Thomas Cruise'
@@ -33,7 +33,7 @@ db.Messages.create({
 })
 .then(function () {
   return db.Messages.create({
-  text: 'bus stop moved',
+  text: 'It just is',
   latitude: 37.3303314,
   longitude: -122.0312186,
   userAuth: 'Thomas Cruise'
@@ -41,7 +41,7 @@ db.Messages.create({
 })
 .then(function () {
   return db.Messages.create({
-  text: 'Pretty trees',
+  text: 'The worst',
   latitude: 37.3303314,
   longitude: -122.0352186,
   userAuth: 'Thomas Cruise'
@@ -49,17 +49,9 @@ db.Messages.create({
 })
 .then(function () {
   return db.Messages.create({
-  text: 'Street performers',
+  text: 'Why was it?',
   latitude: 37.3323314,
   longitude: -122.0372186,
-  userAuth: 'Thomas Cruise'
-  });
-})
-.then(function () {
-  return db.Messages.create({
-  text: 'Best rootbeer!',
-  latitude: 37.3313214,
-  longitude: -122.0317106,
   userAuth: 'Thomas Cruise'
   });
 })
