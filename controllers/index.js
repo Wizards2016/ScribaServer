@@ -36,8 +36,8 @@ module.exports = {
       }
     },
     post: function (req, res) {
-      // console.log('post req: ', req.body);
 
+      console.log('post req: ', req.body);
       if (req.body.delete === true) {
         db.Messages.destroy({
             where: {
@@ -47,7 +47,8 @@ module.exports = {
         .then(() => res.json({status: 'deleted'}))
       } else if (req.body.text.length < 1 || !req.body.latitude || !req.body.longitude) {
         res.sendStatus(406);
-        if(!req.body.userAuth){
+      } else {
+        if(!req.body.userAuth) {
           req.body.userAuth = 'anonymous';
         }
         db.Users.findOrCreate({
