@@ -36,8 +36,6 @@ module.exports = {
       }
     },
     post: function (req, res) {
-      // console.log('post req: ', req.body);
-
       if (req.body.delete === true) {
         db.Messages.destroy({
             where: {
@@ -48,7 +46,11 @@ module.exports = {
       } else if (req.body.text.length < 1 || !req.body.latitude || !req.body.longitude) {
         res.sendStatus(406);
       } else {
+<<<<<<< HEAD
         if(!req.body.userAuth){
+=======
+        if(!req.body.userAuth) {
+>>>>>>> 6ce966ee4970efdba2651a383e8a99df16733f67
           req.body.userAuth = 'anonymous';
         }
         db.Users.findOrCreate({
