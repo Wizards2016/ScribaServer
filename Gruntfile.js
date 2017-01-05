@@ -20,6 +20,17 @@ module.exports = function (grunt) {
       dev: {
         script: 'server.js'
       }
+    },
+    shell: {
+      database: {
+        command: [
+          'mysql.server start',
+          'mysql -u root -e "drop database scribedb; create database scribedb"'
+        ].join('&&')
+      },
+      seed: {
+        command: 'node seed.js'
+      }
     }
   });
 
@@ -28,6 +39,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-nodemon');
+  grunt.loadNpmTasks('grunt-shell');
   // additional tasks
   grunt.registerTask('default', () => {
     grunt.log.write(`Options:
@@ -36,4 +48,5 @@ module.exports = function (grunt) {
   });
   grunt.registerTask('lint', ['eslint']);
   grunt.registerTask('test', ['eslint', 'mochaTest']);
+  grunt.registerTask('db', ['shell:database', 'shell:seed']);
 };
