@@ -47,15 +47,24 @@ module.exports = {
         .then(() => res.json({status: 'deleted'}))
       } else if (req.body.text.length < 1 || !req.body.latitude || !req.body.longitude) {
         res.sendStatus(406);
-      } else {
-        db.Messages.create({
-          text: req.body.text,
-          latitude: req.body.latitude,
-          longitude: req.body.longitude,
-          userAuth: req.body.userAuth
-        })
-        .then(() => {
-          res.sendStatus(201);
+        if(!req.body.userAuth){
+          req.body.userAuth = 'anonymous';
+        }
+        db.Users.findOrCreate({
+          where: {
+            userAuth: req.body.userAuth
+          }
+        }).then((user)=>{
+          db.Messages.create({
+            text: req.body.text,
+            latitude: req.body.latitude,
+            longitude: req.body.longitude,
+            userAuth: req.body.userAuth,
+            UserId: user[0].dataValues.id
+          })
+          .then(() => {
+            res.sendStatus(201);
+          });
         });
       }
     }
