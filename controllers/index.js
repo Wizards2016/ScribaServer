@@ -47,7 +47,6 @@ module.exports = {
         .then(() => res.json({status: 'deleted'}))
       } else if (req.body.text.length < 1 || !req.body.latitude || !req.body.longitude) {
         res.sendStatus(406);
-      } else {
         if(!req.body.userAuth){
           req.body.userAuth = 'anonymous';
         }

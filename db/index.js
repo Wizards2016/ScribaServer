@@ -16,6 +16,7 @@ const Messages = db.define('Messages', {
   subCatagory: Sequelize.STRING,
   upVotes: Sequelize.INTEGER,
   downVotes: Sequelize.INTEGER
+
 });
 
 const Users = db.define('Users', {
