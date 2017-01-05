@@ -37,7 +37,15 @@ module.exports = {
     },
     post: function (req, res) {
       // console.log('post req: ', req.body);
-      if (req.body.text.length < 1) {
+
+      if (req.body.delete === true) {
+        db.Messages.destroy({
+            where: {
+              id: parseInt(req.body.id)
+            }
+        })
+        .then(() => res.json({status: 'deleted'}))
+      } else if (req.body.text.length < 1 || !req.body.userAuth || !req.body.latitude || !req.body.longitude) {
         res.sendStatus(406);
       } else {
         db.Messages.create({
