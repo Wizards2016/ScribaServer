@@ -36,8 +36,6 @@ module.exports = {
       }
     },
     post: function (req, res) {
-
-      console.log('post req: ', req.body);
       if (req.body.delete === true) {
         db.Messages.destroy({
             where: {
