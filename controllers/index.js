@@ -7,7 +7,7 @@ module.exports = {
       if (req.query.latitude && req.query.longitude) { // whereas here has query
         const latitude = parseFloat(req.query.latitude);
         const longitude = parseFloat(req.query.longitude);
-        db.Message.findAll({
+        db.Messages.findAll({
           where: {
             latitude: {
               $between: [latitude - 1, latitude + 1]
@@ -25,7 +25,7 @@ module.exports = {
           console.log('error: ', error);
         });
       } else {
-        db.Message.findAll({}) // find all with no query.
+        db.Messages.findAll({}) // find all with no query.
         .then((data) => {
           // console.log('data: ', data);
           res.json(data);
@@ -37,16 +37,35 @@ module.exports = {
     },
     post: function (req, res) {
       // console.log('post req: ', req.body);
-      if (req.body.text.length < 1) {
+
+      if (req.body.delete === true) {
+        db.Messages.destroy({
+            where: {
+              id: parseInt(req.body.id)
+            }
+        })
+        .then(() => res.json({status: 'deleted'}))
+      } else if (req.body.text.length < 1 || !req.body.latitude || !req.body.longitude) {
         res.sendStatus(406);
       } else {
-        db.Message.create({
-          text: req.body.text,
-          latitude: req.body.latitude,
-          longitude: req.body.longitude
-        })
-        .then(() => {
-          res.sendStatus(201);
+        if(!req.body.userAuth){
+          req.body.userAuth = 'anonymous';
+        }
+        db.Users.findOrCreate({
+          where: {
+            userAuth: req.body.userAuth
+          }
+        }).then((user)=>{
+          db.Messages.create({
+            text: req.body.text,
+            latitude: req.body.latitude,
+            longitude: req.body.longitude,
+            userAuth: req.body.userAuth,
+            UserId: user[0].dataValues.id
+          })
+          .then(() => {
+            res.sendStatus(201);
+          });
         });
       }
     }
