@@ -34,8 +34,15 @@ const Votes = db.define('Votes', {
 Messages.belongsTo(Users);
 Users.hasMany(Messages);
 
+Votes.belongsTo(Messages);
+Messages.hasMany(Votes);
+
+Votes.belongsTo(Users);
+Users.hasMany(Votes);
+
 Messages.sync();
 Users.sync();
+Votes.sync();
 
 exports.Messages = Messages;
 exports.Users = Users;
