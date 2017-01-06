@@ -134,7 +134,7 @@ module.exports = {
               res.send('messsage posted');
             });
           }
-        })
+        });
       }
     }
   },
