@@ -36,6 +36,9 @@ module.exports = {
       }
     },
     post: function (req, res) {
+      // console.log('post req: ', req.body);
+      //do the folowing only if user exists on database
+
       if (req.body.delete === true) {
         db.Messages.destroy({
             where: {
@@ -46,11 +49,7 @@ module.exports = {
       } else if (req.body.text.length < 1 || !req.body.latitude || !req.body.longitude) {
         res.sendStatus(406);
       } else {
-<<<<<<< HEAD
         if(!req.body.userAuth){
-=======
-        if(!req.body.userAuth) {
->>>>>>> 6ce966ee4970efdba2651a383e8a99df16733f67
           req.body.userAuth = 'anonymous';
         }
         db.Users.findOrCreate({
@@ -62,7 +61,6 @@ module.exports = {
             text: req.body.text,
             latitude: req.body.latitude,
             longitude: req.body.longitude,
-            userAuth: req.body.userAuth,
             UserId: user[0].dataValues.id
           })
           .then(() => {
@@ -70,6 +68,62 @@ module.exports = {
           });
         });
       }
+    }
+  },
+  votes: {
+    post: function(req, res) {
+      if(typeof req.body.vote === boolean){
+        db.Votes.findOrCreate({
+          where: {
+            vote: req.body.vote,
+            displayName: req.body.displayName,
+            MessageId: req.body.messageId
+          }
+        });
+        db.Messages.update({
+          
+        });
+        db.Users.update();
+
+      } else {
+        db.Votes.destroy({
+          where: {
+            userDisplayName: req.body.userDisplayName,
+            messageId: req.body.messageId
+          }
+        }).then((result)=>{
+          console.log('destroyed results', result);
+        });
+
+      }
+    }
+  },
+  users:{
+    post: function(req, res) {
+      db.Users.find({
+        where: {
+          displayName: req.body.displayName,
+        }
+      })
+      .then((result)=>{
+        if(result){
+          console.log('Username taken');
+          res.sendStatus(400);
+        } else {
+          db.Users.findOrCreate({
+            where: {
+              displayName: req.body.displayName,
+              userAuth: req.body.userAuth
+            }
+          });
+        }
+      })
+      .catch((err)=>{
+        console.log('Error', err);
+      })
+      .then(()=>{
+        res.sendStatus(201);
+      });
     }
   }
 };
