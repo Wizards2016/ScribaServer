@@ -36,6 +36,9 @@ module.exports = {
       }
     },
     post: function (req, res) {
+      // console.log('post req: ', req.body);
+      //do the folowing only if user exists on database
+
       if (req.body.delete === true) {
         db.Messages.destroy({
             where: {
@@ -46,7 +49,7 @@ module.exports = {
       } else if (req.body.text.length < 1 || !req.body.latitude || !req.body.longitude) {
         res.sendStatus(406);
       } else {
-        if(!req.body.userAuth) {
+        if(!req.body.userAuth){
           req.body.userAuth = 'anonymous';
         }
         db.Users.findOrCreate({
@@ -66,6 +69,51 @@ module.exports = {
           });
         });
       }
+    }
+  },
+  votes: {
+    //post:
+      //if no thumbs up or down
+        //delete if exists
+      //else findorcreate vote
+        //vote up/down
+        //userid
+        //messageid
+        //if up add to up
+        //if down add to down
+    post: function(req, res) {
+      if(typeof req.body.vote === boolean){
+        db.Votes.findOrCreate({
+          where: {
+            vote: req.body.vote,
+            userId: req.body.userId,
+            messageId: req.body.messageId
+          }
+        });
+      } else {
+        db.Votes.destroy({
+          where: {
+            userId: req.body.userId,
+            messageId: req.body.messageId
+          }
+        });
+      }
+    }
+  },
+  users:{
+    //post:
+      //create user
+        //userid
+        //displayname
+        //upvote
+        //downvote
+        //total posts
+    post: function(req, res) {
+      db.Users.create({
+        userId: req.body.userId,
+        displayName: req.body.displayName,
+        userAuth: req.body.userAuth
+      })
     }
   }
 };

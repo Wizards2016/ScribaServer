@@ -3,8 +3,7 @@ const Sequelize = require('sequelize');
 const db = new Sequelize('scribedb', 'root', '');
 
 const Votes = db.define('Votes', {
-  voteUp: Sequelize.BOOLEAN,
-  voteDown: Sequelize.BOOLEAN
+  vote: Sequelize.BOOLEAN
 });
 
 const Messages = db.define('Messages', {
@@ -12,29 +11,47 @@ const Messages = db.define('Messages', {
   latitude: Sequelize.DOUBLE(12, 7),
   longitude: Sequelize.DOUBLE(12, 7),
   userAuth: Sequelize.STRING,
-  catagory: Sequelize.STRING,
-  subCatagory: Sequelize.STRING,
+  category: Sequelize.STRING,
+  subCategory: Sequelize.STRING,
   upVotes: Sequelize.INTEGER,
   downVotes: Sequelize.INTEGER
 });
 
 const Users = db.define('Users', {
-  displayName: Sequelize.STRING,
+  displayName: {
+    type: Sequelize.STRING,
+    primaryKey: true,
+    unique: true
+  },
   userAuth: {
     type: Sequelize.STRING,
-    unique: true,
+    unique: true
+  },
+  upVotes: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0
+  },
+  downVotes: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0
+  },
+  totalPosts: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0
   }
 });
 
 Messages.belongsTo(Users);
+Users.sync()
+.then(()=>{
+  Messages.sync()
+  .then(()=>{
+    Votes.belongsTo(Messages);
+    Votes.belongsTo(Users);
+    Votes.sync();
+  })
+});
 
-Votes.belongsTo(Messages);
-
-Votes.belongsTo(Users);
-
-Messages.sync();
-Users.sync();
-Votes.sync();
-
+exports.Votes = Votes;
 exports.Messages = Messages;
 exports.Users = Users;
