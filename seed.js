@@ -1,6 +1,7 @@
 var db = require('./db/index.js');
 var Messages = db.Messages;
 var Users = db.Users;
+var Votes = db.Votes;
 
 db.Users.create({
   displayName: 'ThomasCruise',
@@ -75,6 +76,20 @@ db.Users.create({
   longitude: -122.0317106,
   userAuth: 'Thomas Cruise',
   UserDisplayName: 'ThomasCruise'
+  });
+})
+.then(function () {
+  return db.Votes.create({
+    vote: true,
+    UserDisplayName: 'ThomasCruise',
+    MessageId: 8
+  });
+})
+.then(function () {
+  return db.Votes.create({
+    vote: false,
+    UserDisplayName: 'ThomasCruise',
+    MessageId: 5
   });
 })
 .then(function () {

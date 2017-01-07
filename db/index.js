@@ -10,11 +10,16 @@ const Messages = db.define('Messages', {
   text: Sequelize.STRING,
   latitude: Sequelize.DOUBLE(12, 7),
   longitude: Sequelize.DOUBLE(12, 7),
-  userAuth: Sequelize.STRING,
   category: Sequelize.STRING,
   subCategory: Sequelize.STRING,
-  upVotes: Sequelize.INTEGER,
-  downVotes: Sequelize.INTEGER
+  upVotes: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0
+  },
+  downVotes: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0
+  }
 });
 
 const Users = db.define('Users', {

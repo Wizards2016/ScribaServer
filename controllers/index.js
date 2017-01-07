@@ -36,84 +36,150 @@ module.exports = {
       }
     },
     post: function (req, res) {
-      // console.log('post req: ', req.body);
-      //do the folowing only if user exists on database
-
+      // post delete request
       if (req.body.delete === true) {
-        db.Messages.destroy({
-            where: {
-              id: parseInt(req.body.id)
-            }
-        })
-        .then(() => res.json({status: 'deleted'}))
-      } else if (req.body.text.length < 1 || !req.body.latitude || !req.body.longitude) {
-        res.sendStatus(406);
-      } else {
-        if(!req.body.userAuth){
-          req.body.userAuth = 'anonymous';
-        }
-        db.Users.findOrCreate({
+        db.Messages.find({
           where: {
-            userAuth: req.body.userAuth
+            id: parseInt(req.body.id)
           }
-        }).then((user)=>{
-          db.Messages.create({
-            text: req.body.text,
-            latitude: req.body.latitude,
-            longitude: req.body.longitude,
-            userAuth: req.body.userAuth,
-            UserId: user[0].dataValues.id
-          })
-          .then(() => {
-            res.sendStatus(201);
-          });
+        })
+        .then((found)=>{
+          //find if message exists with that displayName
+          if(found && found.UserDisplayName === req.body.displayName){
+            // delete message
+            db.Messages.destroy({
+                where: {
+                  id: parseInt(req.body.id)
+                }
+            })
+            // update totalPosts of user with given displayName
+            .then(()=>{
+              db.Users.find({
+                where: {
+                  displayName: req.body.displayName
+                }
+              })
+              .then((user)=>{
+                db.Users.update({totalPosts: user.dataValues.totalPosts-1}, {
+                  where: {
+                displayName: req.body.displayName
+                  }
+                })
+              })
+            })
+            // delete successful
+            .then(() => res.json({status: 'deleted'}))
+          } else {
+            // delete request rejected
+            res.sendStatus(400);
+          }
+        })
+      // post message requires: text, lext.length, latitude, and logitude
+      } else if (!req.body.text || req.body.text.length < 1 || !req.body.latitude || !req.body.longitude) {
+        res.sendStatus(406);
+        // add || !req.body.displayName just for dev purposes, to remove later!
+      } else {
+        // if no name then anonymous just for dev purposes, to remove later!
+        if(!req.body.displayName){
+          req.body.displayName = 'ThomasCruise';
+        }
+        // find and verify displayName must be valid
+        db.Users.find({
+          where: {
+            displayName: req.body.displayName,
+          }
+        })
+        .then((result)=>{
+          if(!result){
+            console.log('Username not valid');
+            res.sendStatus(400);
+          // create message
+          } else {
+            db.Messages.create({
+              text: req.body.text,
+              latitude: req.body.latitude,
+              longitude: req.body.longitude,
+              UserDisplayName: req.body.displayName,
+              category: req.body.category,
+              subCategory: req.body.subCategory
+            })
+            // update users totalPosts
+            .then(()=>{
+              db.Users.find({
+                where: {
+                  displayName: req.body.displayName
+                }
+              })
+              .then((user)=>{
+                db.Users.update({totalPosts: user.dataValues.totalPosts+1}, {
+                  where: {
+                    displayName: req.body.displayName
+                  }
+                })
+              })
+            })
+            .then(() => {
+              res.sendStatus(201);
+            });
+          }
         });
       }
     }
   },
   votes: {
-    //post:
-      //if no thumbs up or down
-        //delete if exists
-      //else findorcreate vote
-        //vote up/down
-        //userid
-        //messageid
-        //if up add to up
-        //if down add to down
     post: function(req, res) {
       if(typeof req.body.vote === boolean){
         db.Votes.findOrCreate({
           where: {
             vote: req.body.vote,
-            userId: req.body.userId,
-            messageId: req.body.messageId
+            displayName: req.body.displayName,
+            MessageId: req.body.messageId
           }
         });
+        db.Messages.update({
+
+        });
+        db.Users.update();
+
       } else {
         db.Votes.destroy({
           where: {
-            userId: req.body.userId,
+            userDisplayName: req.body.userDisplayName,
             messageId: req.body.messageId
           }
+        }).then((result)=>{
+          console.log('destroyed results', result);
         });
+
       }
     }
   },
   users:{
-    //post:
-      //create user
-        //userid
-        //displayname
-        //upvote
-        //downvote
-        //total posts
     post: function(req, res) {
-      db.Users.create({
-        userId: req.body.userId,
-        displayName: req.body.displayName,
-        userAuth: req.body.userAuth
+      db.Users.find({
+        where: {
+          displayName: req.body.displayName,
+        }
       })
+      .then((result)=>{
+        if(!!result){
+          console.log('Username taken: ', req.body.displayName);
+          res.sendStatus(400);
+        } else {
+          db.Users.findOrCreate({
+            where: {
+              displayName: req.body.displayName,
+              userAuth: req.body.userAuth
+            }
+          });
+        }
+      })
+      .catch((err)=>{
+        console.log('Error', err);
+      })
+      .then(()=>{
+        res.sendStatus(201);
+      });
     }
   }
 };
