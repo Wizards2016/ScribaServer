@@ -36,36 +36,94 @@ module.exports = {
       }
     },
     post: function (req, res) {
+      console.log('delete request: ',req.body);
       // console.log('post req: ', req.body);
-      //do the folowing only if user exists on database
-
+      // post delete request
       if (req.body.delete === true) {
-        db.Messages.destroy({
-            where: {
-              id: parseInt(req.body.id)
-            }
-        })
-        .then(() => res.json({status: 'deleted'}))
-      } else if (req.body.text.length < 1 || !req.body.latitude || !req.body.longitude) {
-        res.sendStatus(406);
-      } else {
-        if(!req.body.userAuth){
-          req.body.userAuth = 'anonymous';
-        }
-        db.Users.findOrCreate({
+        db.Messages.find({
           where: {
-            userAuth: req.body.userAuth
+            id: parseInt(req.body.id)
           }
-        }).then((user)=>{
-          db.Messages.create({
-            text: req.body.text,
-            latitude: req.body.latitude,
-            longitude: req.body.longitude,
-            UserId: user[0].dataValues.id
-          })
-          .then(() => {
-            res.sendStatus(201);
-          });
+        })
+        .then((found)=>{
+          //find if message exists with that displayName
+          if(found && found.UserDisplayName === req.body.displayName){
+            // delete message
+            db.Messages.destroy({
+                where: {
+                  id: parseInt(req.body.id)
+                }
+            })
+            // update totalPosts of user with given displayName
+            .then(()=>{
+              db.Users.find({
+                where: {
+                  displayName: req.body.displayName
+                }
+              })
+              .then((user)=>{
+                db.Users.update({totalPosts: user.dataValues.totalPosts-1}, {
+                  where: {
+                displayName: req.body.displayName
+                  }
+                })
+              })
+            })
+            // delete successful
+            .then(() => res.json({status: 'deleted'}))
+          } else {
+            // delete request rejected
+            res.sendStatus(400);
+          }
+        })
+      // post message requires: text, lext.length, latitude, and logitude
+      } else if (!req.body.text || req.body.text.length < 1 || !req.body.latitude || !req.body.longitude) {
+        res.sendStatus(406);
+        // add || !req.body.displayName just for dev purposes, to remove later!
+      } else {
+        // if no name then anonymous just for dev purposes, to remove later!
+        if(!req.body.displayName){
+          req.body.displayName = 'ThomasCruise';
+        }
+        // find and verify displayName must be valid
+        db.Users.find({
+          where: {
+            displayName: req.body.displayName,
+          }
+        })
+        .then((result)=>{
+          if(!result){
+            console.log('Username not valid');
+            res.sendStatus(400);
+          // create message
+          } else {
+            db.Messages.create({
+              text: req.body.text,
+              latitude: req.body.latitude,
+              longitude: req.body.longitude,
+              UserDisplayName: req.body.displayName,
+              category: req.body.category,
+              subCategory: req.body.subCategory
+            })
+            // update users totalPosts
+            .then(()=>{
+              db.Users.find({
+                where: {
+                  displayName: req.body.displayName
+                }
+              })
+              .then((user)=>{
+                db.Users.update({totalPosts: user.dataValues.totalPosts+1}, {
+                  where: {
+                    displayName: req.body.displayName
+                  }
+                })
+              })
+            })
+            .then(() => {
+              res.sendStatus(201);
+            });
+          }
         });
       }
     }
@@ -81,7 +139,7 @@ module.exports = {
           }
         });
         db.Messages.update({
-          
+
         });
         db.Users.update();
 
@@ -106,8 +164,8 @@ module.exports = {
         }
       })
       .then((result)=>{
-        if(result){
-          console.log('Username taken');
+        if(!!result){
+          console.log('Username taken: ', req.body.displayName);
           res.sendStatus(400);
         } else {
           db.Users.findOrCreate({
