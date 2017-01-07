@@ -87,6 +87,7 @@ module.exports = {
         db.Users.find({
           where: {
             displayName: req.body.displayName,
+            userAuth: req.body.userAuth
           }
         })
         .then((result)=>{
@@ -95,6 +96,7 @@ module.exports = {
             res.sendStatus(400);
           // create message
           } else {
+
             db.Messages.create({
               text: req.body.text,
               latitude: req.body.latitude,
@@ -128,30 +130,67 @@ module.exports = {
   },
   votes: {
     post: function(req, res) {
-      if(typeof req.body.vote === boolean){
-        db.Votes.findOrCreate({
-          where: {
-            vote: req.body.vote,
-            displayName: req.body.displayName,
-            MessageId: req.body.messageId
-          }
-        });
-        db.Messages.update({
+      // validate user
+      db.Users.find({
+        where: {
+          displayName: req.body.displayName,
+          userAuth: req.body.userAuth
+        }
+      })
+      .then((user)=>{
+      // Note: insert vote delete here
+        // vote request valid
+        // user name and auth, message exists
+        if(user){
+          db.Messages.find({
+            where: {
+              id: req.body.messageId
+            }
+          })
+          .then((message)=>{
+            if(message){
+              db.Votes.find({
+                where: {
+                  UserDisplayName: req.body.displayName,
+                  MessageId: req.body.messageId
+                }
+              })
+              // add vote to vote table
+              // find vote, if not found then create, if found then update,
+              .then((vote)=>{
+                if(!vote){
+                  db.Votes.create({
+                    vote: req.body.vote,
+                    UserDisplayName: req.body.displayName,
+                    MessageId: req.body.messageId
+                  })
+                } else {
+                  db.Votes.update({vote: req.body.vote},{
+                    where: {
+                      UserDisplayName: req.body.displayName,
+                      MessageId: req.body.messageId
+                    }
+                  });
+                }
+              });
 
-        });
-        db.Users.update();
-
-      } else {
-        db.Votes.destroy({
-          where: {
-            userDisplayName: req.body.userDisplayName,
-            messageId: req.body.messageId
-          }
-        }).then((result)=>{
-          console.log('destroyed results', result);
-        });
-
-      }
+            } else {
+              res.sendStatus(400);
+            }
+          })
+        } else if(req.body.delete){
+          db.Votes.destroy({
+            where: {
+              userDisplayName: req.body.userDisplayName,
+              messageId: req.body.messageId
+            }
+          }).then((result)=>{
+            console.log('destroyed results', result);
+          });
+        } else {
+          res.sendStatus(400);
+        }
+      });
     }
   },
   users:{
