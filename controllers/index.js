@@ -36,8 +36,6 @@ module.exports = {
       }
     },
     post: function (req, res) {
-      console.log('delete request: ',req.body);
-      // console.log('post req: ', req.body);
       // post delete request
       if (req.body.delete === true) {
         db.Messages.find({

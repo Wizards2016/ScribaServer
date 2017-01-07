@@ -19,7 +19,6 @@ const Messages = db.define('Messages', {
   downVotes: {
     type: Sequelize.INTEGER,
     defaultValue: 0
-
   }
 });
 

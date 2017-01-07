@@ -1,7 +1,7 @@
 var db = require('./db/index.js');
 var Messages = db.Messages;
 var Users = db.Users;
-var Votes =
+var Votes = db.Votes;
 
 db.Users.create({
   displayName: 'ThomasCruise',
