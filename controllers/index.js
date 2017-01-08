@@ -87,6 +87,7 @@ module.exports = {
         db.Users.find({
           where: {
             displayName: req.body.displayName,
+            userAuth: req.body.userAuth
           }
         })
         .then((result)=>{
@@ -95,6 +96,7 @@ module.exports = {
             res.sendStatus(400);
           // create message
           } else {
+
             db.Messages.create({
               text: req.body.text,
               latitude: req.body.latitude,
@@ -128,32 +130,110 @@ module.exports = {
   },
   votes: {
     post: function(req, res) {
-      if(typeof req.body.vote === boolean){
-        db.Votes.findOrCreate({
-          where: {
-            vote: req.body.vote,
-            displayName: req.body.displayName,
-            MessageId: req.body.messageId
-          }
-        });
-        db.Messages.update({
+      var resStatus = 200;
+      // validate user
+      db.Users.find({
+        where: {
+          displayName: req.body.displayName,
+          userAuth: req.body.userAuth
+        }
+      })
+      .then((user)=>{
+        // validate message exists
+        if(user){
+          db.Messages.find({
+            where: {
+              id: req.body.messageId
+            }
+          })
+          .then((message)=>{
+          var upvoteDif = 0;
+          var downvoteDif = 0;
+          var boolVote = !!req.body.vote;
+            if(message){
+              // check vote exists
+              db.Votes.find({
+                where: {
+                  UserDisplayName: req.body.displayName,
+                  MessageId: req.body.messageId
+                }
+              })
+              .then((vote)=>{
+                if(vote && vote.dataValues.vote == boolVote) {
+                  resStatus = 204;
+                } else {
+                  // delete vote
+                  if(req.body.delete || boolVote === undefined || boolVote === null){
+                    vote.dataValues.vote ? upvoteDif-- : downvoteDif--;
+                    db.Votes.destroy({
+                      where: {
+                        UserDisplayName: req.body.displayName,
+                        MessageId: req.body.messageId
+                      }
+                    });
+                  // if vote not found, then create
+                  } else if(!vote){
+                    db.Votes.create({
+                      vote: boolVote,
+                      UserDisplayName: req.body.displayName,
+                      MessageId: req.body.messageId
+                    })
+                    boolVote == true ? upvoteDif+=1 : downvoteDif+=1;
+                  // if vote found, then update
+                  } else {
+                    db.Votes.update({vote: boolVote},{
+                      where: {
+                        UserDisplayName: req.body.displayName,
+                        MessageId: req.body.messageId
+                      }
+                    });
+                    vote.dataValues.vote ? upvoteDif-- : downvoteDif--;
+                    boolVote ? upvoteDif++ : downvoteDif++;
+                  }
+                  // update message stats
+                  db.Messages.update({
+                      upVotes: message.dataValues.upVotes + upvoteDif,
+                      downVotes: message.dataValues.downVotes + downvoteDif
+                    }, {
+                    where: {
+                      id: req.body.messageId
+                    }
+                  });
+                  db.Messages.find({
+                    where: {
+                      id: req.body.messageId
+                    }
+                  })
+                  .then((message)=>{
+                    // update user vote totals
+                    db.Users.update({
+                        upVotes: message.dataValues.upVotes + upvoteDif,
+                        downVotes: message.dataValues.downVotes + downvoteDif
+                      }, {
+                      where: {
+                        displayName: message.dataValues.UserDisplayName
+                      }
+                    });
+                  }); //then message for user stats
+                  resStatus = 201;
+                } // else !(vote && vote.dataValues.vote == boolVote)
+              }); // then vote
+            } else {
+              //message not valid so 400
+              resStatus = 400;
+            }
+          }); //then message
+        } else {
+          //user not valid so 400
+          resStatus = 400;
+        }
+      }) //then user
+      .then(()=>{
+        res.sendStatus(resStatus);
+      });
+    } //posts
+  }, //votes
 
-        });
-        db.Users.update();
-
-      } else {
-        db.Votes.destroy({
-          where: {
-            userDisplayName: req.body.userDisplayName,
-            messageId: req.body.messageId
-          }
-        }).then((result)=>{
-          console.log('destroyed results', result);
-        });
-
-      }
-    }
-  },
   users:{
     post: function(req, res) {
       db.Users.find({
