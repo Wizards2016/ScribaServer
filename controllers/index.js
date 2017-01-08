@@ -139,15 +139,17 @@ module.exports = {
       })
       .then((user)=>{
       // Note: insert vote delete here
-        // vote request valid
-        // user name and auth, message exists
+        // validate message exists
         if(user){
           db.Messages.find({
             where: {
               id: req.body.messageId
             }
           })
+          // if vote exists
           .then((message)=>{
+          var upvoteDif = 0;
+          var downvoteDif = 0;
             if(message){
               db.Votes.find({
                 where: {
@@ -155,25 +157,34 @@ module.exports = {
                   MessageId: req.body.messageId
                 }
               })
-              // add vote to vote table
-              // find vote, if not found then create, if found then update,
+              // if vote not found, then create
               .then((vote)=>{
+                //store vote
                 if(!vote){
                   db.Votes.create({
                     vote: req.body.vote,
                     UserDisplayName: req.body.displayName,
                     MessageId: req.body.messageId
                   })
+                  req.body.vote ? upvoteDif++ : downvoteDif++;
+                // if vote found, then update
                 } else {
-                  db.Votes.update({vote: req.body.vote},{
-                    where: {
-                      UserDisplayName: req.body.displayName,
-                      MessageId: req.body.messageId
-                    }
-                  });
+                  if(vote.dataValues.vote === !!req.body.vote) {
+                    res.sendStatus(200);
+                  } else {
+                    console.log('else for update');
+                    db.Votes.update({vote: req.body.vote},{
+                      where: {
+                        UserDisplayName: req.body.displayName,
+                        MessageId: req.body.messageId
+                      }
+                    });
+                    vote.dataValues.vote ? upvoteDif-- : downvoteDif--;
+                    req.body.vote ? upvoteDif++ : downvoteDif++;
+                  } 
                 }
-              });
-
+              })
+              res.sendStatus(201);
             } else {
               res.sendStatus(400);
             }
