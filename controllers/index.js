@@ -233,7 +233,6 @@ module.exports = {
       });
     } //posts
   }, //votes
-
   users:{
     post: function(req, res) {
       db.Users.find({
