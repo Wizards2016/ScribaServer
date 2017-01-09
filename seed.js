@@ -5,7 +5,10 @@ var Votes = db.Votes;
 
 db.Users.create({
   displayName: 'ThomasCruise',
-  userAuth: 'Thomas Cruise'
+  userAuth: 'Thomas Cruise',
+  upVotes: 1,
+  downVotes: 1,
+  totalPosts: 8
 }).then(function () {
     db.Messages.create({
     text: 'Free couch',
@@ -47,6 +50,7 @@ db.Users.create({
   text: 'bus stop moved',
   latitude: 37.3303314,
   longitude: -122.0312186,
+  upVotes: 1,
   userAuth: 'Thomas Cruise',
   UserDisplayName: 'ThomasCruise'
   });
@@ -74,6 +78,7 @@ db.Users.create({
   text: 'Best rootbeer!',
   latitude: 37.3313214,
   longitude: -122.0317106,
+  downVotes: 1,
   userAuth: 'Thomas Cruise',
   UserDisplayName: 'ThomasCruise'
   });
