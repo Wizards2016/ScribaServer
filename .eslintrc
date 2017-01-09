@@ -4,7 +4,9 @@
     "comma-dangle": ["error", "never"],
     "import/newline-after-import": 0,
     "object-shorthand": ['error', 'consistent'],
-    "no-shadow": ["error", { "hoist": "functions", "allow": ["response"] }]
+    "no-shadow": ["warn", { "hoist": "functions", "allow": ["response"] }],
+    "no-param-reassign": ["warn", { "props": true }],
+    "no-unused-expressions": [2, { allowTernary: true }],
   },
   "env": {
     "jasmine": true
