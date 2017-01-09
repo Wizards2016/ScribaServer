@@ -48,13 +48,13 @@ const Users = db.define('Users', {
 
 Messages.belongsTo(Users);
 Users.sync()
-.then(()=>{
+.then(() => {
   Messages.sync()
-  .then(()=>{
+  .then(() => {
     Votes.belongsTo(Messages);
     Votes.belongsTo(Users);
     Votes.sync();
-  })
+  });
 });
 
 exports.Votes = Votes;
