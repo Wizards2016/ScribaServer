@@ -175,6 +175,7 @@ module.exports = {
                     res.send('vote removed');
                   // if vote not found, then create
                   } else if(!vote){
+                    console.log('intheelseif===========================');
                     db.Votes.create({
                       vote: boolVote,
                       UserDisplayName: req.body.displayName,
