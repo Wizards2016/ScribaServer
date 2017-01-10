@@ -9,6 +9,7 @@ app.use('/', router);
 
 router.get('/messages', controller.messages.get);
 router.post('/messages', controller.messages.post);
+router.get('/users', controller.users.get);
 router.post('/users', controller.users.post);
 router.get('/votes', controller.votes.get);
 router.post('/votes', controller.votes.post);
