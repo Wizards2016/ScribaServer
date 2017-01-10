@@ -3,31 +3,29 @@ const db = require('../db');
 module.exports = {
   messages: {
     get: function (req, res) {
-      // console.log('get req: ', req.query);
-      if (req.query.latitude && req.query.longitude) { // whereas here has query
+      if (req.query.latitude && req.query.longitude) {
         const latitude = parseFloat(req.query.latitude);
         const longitude = parseFloat(req.query.longitude);
+        const viewDistance = parseFloat(req.query.distance) || 1;
         db.Messages.findAll({
           where: {
             latitude: {
-              $between: [latitude - 1, latitude + 1]
+              $between: [latitude - viewDistance, latitude + viewDistance]
             },
             longitude: {
-              $between: [longitude - 1, longitude + 1]
+              $between: [longitude - viewDistance, longitude + viewDistance]
             }
           }
         })
         .then((data) => {
-          // console.log('data: ', data);
           res.json(data);
         })
         .catch((error) => {
           console.log('error: ', error);
         });
       } else {
-        db.Messages.findAll({}) // find all with no query.
+        db.Messages.findAll({})
         .then((data) => {
-          // console.log('data: ', data);
           res.json(data);
         })
         .catch((error) => {
@@ -43,46 +41,58 @@ module.exports = {
             id: parseInt(req.body.id)
           }
         })
-        .then((found)=>{
-          //find if message exists with that displayName
-          if(found && found.UserDisplayName === req.body.displayName){
-            // delete message
-            db.Messages.destroy({
-                where: {
-                  id: parseInt(req.body.id)
-                }
-            })
-            // update totalPosts of user with given displayName
-            .then(()=>{
-              db.Users.find({
-                where: {
-                  displayName: req.body.displayName
-                }
-              })
-              .then((user)=>{
-                db.Users.update({totalPosts: user.dataValues.totalPosts-1}, {
-                  where: {
+        .then((message)=>{
+          // find if message exists with that displayName
+          if(message && message.UserDisplayName === req.body.displayName){
+            db.Users.find({
+              where: {
                 displayName: req.body.displayName
-                  }
+              }
+            }).then((user)=>{
+              if(user.userAuth === req.body.userAuth){
+                // delete message
+                db.Messages.destroy({
+                    where: {
+                      id: parseInt(req.body.id)
+                    }
                 })
-              })
+                // update totalPosts of messages author
+                .then(()=>{
+                  db.Users.find({
+                    where: {
+                      displayName: req.body.displayName
+                    }
+                  })
+                  .then((user)=>{
+                    db.Users.update({totalPosts: user.dataValues.totalPosts-1}, {
+                      where: {
+                    displayName: req.body.displayName
+                      }
+                    })
+                  })
+                })
+                .then(() => {
+                res.status(200);
+                res.send('message deleted');
+                })
+              } else {
+                res.status(400);
+                res.send('userAuth wrong, users can only delete their own messages');
+              }
             })
-            // delete successful
-            .then(() => res.json({status: 'deleted'}))
+          } else if (!message){
+            res.status(400);
+            res.send('message not found');
           } else {
-            // delete request rejected
-            res.sendStatus(400);
+            res.status(400);
+            res.send('displayName not associated with that message');
           }
         })
       // post message requires: text, lext.length, latitude, and logitude
-      } else if (!req.body.text || req.body.text.length < 1 || !req.body.latitude || !req.body.longitude) {
-        res.sendStatus(406);
-        // add || !req.body.displayName just for dev purposes, to remove later!
+      } else if (!req.body.text || req.body.text.length < 1 || !req.body.latitude || !req.body.longitude || !req.body.displayName) {
+        res.status(406);
+        res.send('valid user, text, latitude, and logitude required');
       } else {
-        // if no name then anonymous just for dev purposes, to remove later!
-        if(!req.body.displayName){
-          req.body.displayName = 'ThomasCruise';
-        }
         // find and verify displayName must be valid
         db.Users.find({
           where: {
@@ -90,13 +100,12 @@ module.exports = {
             userAuth: req.body.userAuth
           }
         })
-        .then((result)=>{
-          if(!result){
-            console.log('Username not valid');
-            res.sendStatus(400);
+        .then((user)=>{
+          if(!user){
+            res.status(400);
+            res.send('displayName and/or userAuth is incorrect');
           // create message
           } else {
-
             db.Messages.create({
               text: req.body.text,
               latitude: req.body.latitude,
@@ -121,10 +130,11 @@ module.exports = {
               })
             })
             .then(() => {
-              res.sendStatus(201);
+              res.status(201);
+              res.send('messsage posted');
             });
           }
-        });
+        })
       }
     }
   },
@@ -273,7 +283,7 @@ module.exports = {
                 res.status(400);
                 res.send('User name already taken');
               } else {
-                db.Users.findOrCreate({
+                db.Users.create({
                   where: {
                     displayName: req.body.displayName,
                     userAuth: req.body.userAuth
@@ -305,6 +315,6 @@ module.exports = {
           res.send('user display name required');
         }
       })
-    } //users/get
+    }
   }
 };
