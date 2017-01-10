@@ -130,7 +130,6 @@ module.exports = {
   },
   votes: {
     post: function(req, res) {
-      var resStatus = 200;
       // validate user
       db.Users.find({
         where: {
@@ -159,11 +158,12 @@ module.exports = {
                 }
               })
               .then((vote)=>{
-                if(vote && vote.dataValues.vote == boolVote) {
-                  resStatus = 204;
+                if(vote && vote.dataValues.vote === req.body.vote && !req.body.delete) {
+                  res.status(200);
+                  res.send('vote already on record');
                 } else {
                   // delete vote
-                  if(req.body.delete || boolVote === undefined || boolVote === null){
+                  if(req.body.delete || req.body.vote === undefined || req.body.vote === null){
                     vote.dataValues.vote ? upvoteDif-- : downvoteDif--;
                     db.Votes.destroy({
                       where: {
@@ -171,6 +171,8 @@ module.exports = {
                         MessageId: req.body.messageId
                       }
                     });
+                    res.status(200);
+                    res.send('vote removed');
                   // if vote not found, then create
                   } else if(!vote){
                     db.Votes.create({
@@ -213,24 +215,24 @@ module.exports = {
                       where: {
                         displayName: message.dataValues.UserDisplayName
                       }
+                    })
+                    .then(()=>{
+                    res.status(201);
+                    res.send('vote recorded');
                     });
                   }); //then message for user stats
-                  resStatus = 201;
                 } // else !(vote && vote.dataValues.vote == boolVote)
               }); // then vote
             } else {
-              //message not valid so 400
-              resStatus = 400;
+              res.status(400);
+              res.send('message not valid');
             }
           }); //then message
         } else {
-          //user not valid so 400
-          resStatus = 400;
+          res.status(400);
+          res.send('user not valid');
         }
       }) //then user
-      .then(()=>{
-        res.sendStatus(resStatus);
-      });
     } //posts
   }, //votes
   users:{
