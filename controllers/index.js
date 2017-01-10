@@ -41,35 +41,51 @@ module.exports = {
             id: parseInt(req.body.id)
           }
         })
-        .then((found)=>{
-          //find if message exists with that displayName
-          if(found && found.UserDisplayName === req.body.displayName){
-            // delete message
-            db.Messages.destroy({
-                where: {
-                  id: parseInt(req.body.id)
-                }
-            })
-            // update totalPosts of user with given displayName
-            .then(()=>{
-              db.Users.find({
-                where: {
-                  displayName: req.body.displayName
-                }
-              })
-              .then((user)=>{
-                db.Users.update({totalPosts: user.dataValues.totalPosts-1}, {
-                  where: {
+        .then((message)=>{
+          // find if message exists with that displayName
+          if(message && message.UserDisplayName === req.body.displayName){
+            db.Users.find({
+              where: {
                 displayName: req.body.displayName
-                  }
+              }
+            }).then((user)=>{
+              if(user.userAuth === req.body.userAuth){
+                // delete message
+                db.Messages.destroy({
+                    where: {
+                      id: parseInt(req.body.id)
+                    }
                 })
-              })
+                // update totalPosts of messages author
+                .then(()=>{
+                  db.Users.find({
+                    where: {
+                      displayName: req.body.displayName
+                    }
+                  })
+                  .then((user)=>{
+                    db.Users.update({totalPosts: user.dataValues.totalPosts-1}, {
+                      where: {
+                    displayName: req.body.displayName
+                      }
+                    })
+                  })
+                })
+                .then(() => {
+                res.status(200);
+                res.send('message deleted');
+                })
+              } else {
+                res.status(400);
+                res.send('userAuth wrong, users can only delete their own messages');
+              }
             })
-            // delete successful
-            .then(() => res.json({status: 'deleted'}))
+          } else if (!message){
+            res.status(400);
+            res.send('message not found');
           } else {
-            // delete request rejected
-            res.sendStatus(400);
+            res.status(400);
+            res.send('displayName not associated with that message');
           }
         })
       // post message requires: text, lext.length, latitude, and logitude
@@ -77,10 +93,6 @@ module.exports = {
         res.status(406);
         res.send('valid user, text, latitude, and logitude required');
       } else {
-        // if no name then anonymous just for dev purposes, to remove later!
-        if(!req.body.displayName){
-          req.body.displayName = 'ThomasCruise';
-        }
         // find and verify displayName must be valid
         db.Users.find({
           where: {
@@ -88,10 +100,10 @@ module.exports = {
             userAuth: req.body.userAuth
           }
         })
-        .then((result)=>{
-          if(!result){
-          res.status(400);
-          res.send('Username not valid');
+        .then((user)=>{
+          if(!user){
+            res.status(400);
+            res.send('displayName and/or userAuth is incorrect');
           // create message
           } else {
             db.Messages.create({
@@ -122,7 +134,7 @@ module.exports = {
               res.send('messsage posted');
             });
           }
-        });
+        })
       }
     }
   },
