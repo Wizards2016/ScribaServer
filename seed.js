@@ -50,7 +50,7 @@ db.Users.create({
   text: 'bus stop moved',
   latitude: 37.3303314,
   longitude: -122.0312186,
-  upVotes: 1,
+  downVotes: 1,
   userAuth: 'Thomas Cruise',
   UserDisplayName: 'ThomasCruise'
   });
@@ -78,7 +78,7 @@ db.Users.create({
   text: 'Best rootbeer!',
   latitude: 37.3313214,
   longitude: -122.0317106,
-  downVotes: 1,
+  upVotes: 1,
   userAuth: 'Thomas Cruise',
   UserDisplayName: 'ThomasCruise'
   });
