@@ -6,7 +6,7 @@ module.exports = {
       if (req.query.latitude && req.query.longitude) {
         const latitude = parseFloat(req.query.latitude);
         const longitude = parseFloat(req.query.longitude);
-        const viewDistance = parseInt(req.query.distance) || 1;
+        const viewDistance = parseFloat(req.query.distance) || 1;
         db.Messages.findAll({
           where: {
             latitude: {
