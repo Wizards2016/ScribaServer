@@ -56,12 +56,6 @@ Users.sync()
     Votes.sync();
   });
 });
-// db.sync()
-//   .then(() => {
-//     Messages.belongsTo(Users);
-//     Votes.belongsTo(Messages);
-//     Votes.belongsTo(Users);
-//   });
 
 exports.Votes = Votes;
 exports.Messages = Messages;

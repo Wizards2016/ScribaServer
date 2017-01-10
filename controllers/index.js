@@ -33,7 +33,7 @@ module.exports = {
         });
       }
     },
-    post: (req, res) => {
+    post: function (req, res) {
       // post delete request
       if(!req.body.id) {
         res.status(400);
@@ -41,7 +41,7 @@ module.exports = {
       } else if (req.body.delete === true) {
         db.Messages.find({
           where: {
-            id: parseInt(req.body.id, 0)
+            id: parseInt(req.body.id)
           }
         })
         .then((message)=>{
@@ -90,7 +90,7 @@ module.exports = {
             res.status(400);
             res.send('displayName not associated with that message');
           }
-        });
+        })
       // post message requires: text, lext.length, latitude, and logitude
       } else if (!req.body.text || req.body.text.length < 1 || !req.body.latitude || !req.body.longitude || !req.body.displayName) {
         res.status(406);
@@ -118,19 +118,19 @@ module.exports = {
               subCategory: req.body.subCategory
             })
             // update users totalPosts
-            .then(() => {
+            .then(()=>{
               db.Users.find({
                 where: {
                   displayName: req.body.displayName
                 }
               })
-              .then((user) => {
-                db.Users.update({ totalPosts: user.dataValues.totalPosts + 1 }, {
+              .then((user)=>{
+                db.Users.update({totalPosts: user.dataValues.totalPosts+1}, {
                   where: {
                     displayName: req.body.displayName
                   }
-                });
-              });
+                })
+              })
             })
             .then(() => {
               res.status(201);
@@ -162,19 +162,19 @@ module.exports = {
           userAuth: req.body.userAuth
         }
       })
-      .then((user) => {
+      .then((user)=>{
         // validate message exists
-        if (user) {
+        if(user){
           db.Messages.find({
             where: {
               id: req.body.messageId
             }
           })
-          .then((message) => {
-            let upvoteDif = 0;
-            let downvoteDif = 0;
-            const boolVote = !!req.body.vote;
-            if (message) {
+          .then((message)=>{
+          var upvoteDif = 0;
+          var downvoteDif = 0;
+          var boolVote = !!req.body.vote;
+            if(message){
               // check vote exists
               db.Votes.find({
                 where: {
@@ -204,29 +204,29 @@ module.exports = {
                       res.send('vote removed');
                     }
                   // if vote not found, then create
-                  } else if (!vote) {
+                  } else if(!vote){
                     db.Votes.create({
                       vote: boolVote,
                       UserDisplayName: req.body.displayName,
                       MessageId: req.body.messageId
-                    });
-                    boolVote === true ? (upvoteDif += 1) : (downvoteDif += 1);
+                    })
+                    boolVote == true ? upvoteDif+=1 : downvoteDif+=1;
                   // if vote found, then update
                   } else {
-                    db.Votes.update({ vote: boolVote }, {
+                    db.Votes.update({vote: boolVote},{
                       where: {
                         UserDisplayName: req.body.displayName,
                         MessageId: req.body.messageId
                       }
                     });
-                    vote.dataValues.vote ? (upvoteDif -= 1) : (downvoteDif -= 1);
-                    boolVote ? (upvoteDif += 1) : (downvoteDif += 1);
+                    vote.dataValues.vote ? upvoteDif-- : downvoteDif--;
+                    boolVote ? upvoteDif++ : downvoteDif++;
                   }
                   // update message stats
                   db.Messages.update({
-                    upVotes: message.dataValues.upVotes + upvoteDif,
-                    downVotes: message.dataValues.downVotes + downvoteDif
-                  }, {
+                      upVotes: message.dataValues.upVotes + upvoteDif,
+                      downVotes: message.dataValues.downVotes + downvoteDif
+                    }, {
                     where: {
                       id: req.body.messageId
                     }
@@ -236,12 +236,13 @@ module.exports = {
                       id: req.body.messageId
                     }
                   })
-                  .then((message) => {
+                  .then((message)=>{
                     // update user vote totals
+                    console.log('=====================================================:', message.dataValues);
                     db.Users.update({
-                      upVotes: message.dataValues.upVotes + upvoteDif,
-                      downVotes: message.dataValues.downVotes + downvoteDif
-                    }, {
+                        upVotes: message.dataValues.upVotes + upvoteDif,
+                        downVotes: message.dataValues.downVotes + downvoteDif
+                      }, {
                       where: {
                         displayName: message.dataValues.UserDisplayName
                       }
@@ -257,7 +258,7 @@ module.exports = {
               res.status(400);
               res.send('message not valid');
             }
-          }); // then message
+          }); //then message
         } else {
           res.status(400);
           res.send('user not valid');
@@ -291,7 +292,6 @@ module.exports = {
                 res.status(400);
                 res.send('User name already taken');
               } else {
-                console.log('=========================req.body:', req.body.userAuth);
                 db.Users.create({
                   displayName: req.body.displayName,
                   userAuth: req.body.userAuth
