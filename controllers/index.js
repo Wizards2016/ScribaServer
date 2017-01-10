@@ -249,30 +249,43 @@ module.exports = {
   }, //votes
   users:{
     post: function(req, res) {
-      db.Users.find({
-        where: {
-          displayName: req.body.displayName,
-        }
-      })
-      .then((user)=>{
-        if(!!user){
-          console.log('Username taken: ', req.body.displayName);
-          res.sendStatus(400);
-        } else {
-          db.Users.findOrCreate({
-            where: {
-              displayName: req.body.displayName,
-              userAuth: req.body.userAuth
-            }
-          });
-        }
-      })
-      .catch((err)=>{
-        console.log('Error', err);
-      })
-      .then(()=>{
-        res.sendStatus(201);
-      });
+      if(!req.body.displayName || !req.body.userAuth){
+        res.status(400);
+        res.send('userAuth and UserDisplayName requried');
+      } else {
+        db.Users.find({
+          where: {
+            userAuth: req.body.userAuth
+          }
+        })
+        .then((user)=>{
+          if(!!user){
+            res.status(400);
+            res.send('User already registered');
+          } else {
+            db.Users.find({
+              where: {
+                displayName: req.body.displayName,
+              }
+            })
+            .then((user)=>{
+              if(!!user){
+                res.status(400);
+                res.send('User name already taken');
+              } else {
+                db.Users.findOrCreate({
+                  where: {
+                    displayName: req.body.displayName,
+                    userAuth: req.body.userAuth
+                  }
+                });
+                res.status(201);
+                res.send('New user created');
+              }
+            })
+          }
+        })
+      }
     },
     get: function(req, res) {
       db.Users.find({
