@@ -284,10 +284,8 @@ module.exports = {
                 res.send('User name already taken');
               } else {
                 db.Users.create({
-                  where: {
-                    displayName: req.body.displayName,
-                    userAuth: req.body.userAuth
-                  }
+                  displayName: req.body.displayName,
+                  userAuth: req.body.userAuth
                 });
                 res.status(201);
                 res.send('New user created');
@@ -314,7 +312,7 @@ module.exports = {
           res.status(204);
           res.send('user display name required');
         }
-      })
+      });
     }
   }
 };
