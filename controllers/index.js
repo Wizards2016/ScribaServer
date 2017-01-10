@@ -259,7 +259,6 @@ module.exports = {
   }, //votes
   users:{
     post: function(req, res) {
-      console.log(typeof req.body.displayName);
       if(!req.body.displayName || !req.body.userAuth){
         res.status(400);
         res.send('userAuth and UserDisplayName requried');
@@ -303,7 +302,6 @@ module.exports = {
         }
       })
       .then((user)=>{
-        console.log(typeof req.query);
         if(!user){
           res.status(400);
           res.send('user not on database');
