@@ -3,31 +3,29 @@ const db = require('../db');
 module.exports = {
   messages: {
     get: function (req, res) {
-      // console.log('get req: ', req.query);
-      if (req.query.latitude && req.query.longitude) { // whereas here has query
+      if (req.query.latitude && req.query.longitude) {
         const latitude = parseFloat(req.query.latitude);
         const longitude = parseFloat(req.query.longitude);
+        const viewDistance = parseInt(req.query.distance) || 1;
         db.Messages.findAll({
           where: {
             latitude: {
-              $between: [latitude - 1, latitude + 1]
+              $between: [latitude - viewDistance, latitude + viewDistance]
             },
             longitude: {
-              $between: [longitude - 1, longitude + 1]
+              $between: [longitude - viewDistance, longitude + viewDistance]
             }
           }
         })
         .then((data) => {
-          // console.log('data: ', data);
           res.json(data);
         })
         .catch((error) => {
           console.log('error: ', error);
         });
       } else {
-        db.Messages.findAll({}) // find all with no query.
+        db.Messages.findAll({})
         .then((data) => {
-          // console.log('data: ', data);
           res.json(data);
         })
         .catch((error) => {
@@ -75,9 +73,9 @@ module.exports = {
           }
         })
       // post message requires: text, lext.length, latitude, and logitude
-      } else if (!req.body.text || req.body.text.length < 1 || !req.body.latitude || !req.body.longitude) {
-        res.sendStatus(406);
-        // add || !req.body.displayName just for dev purposes, to remove later!
+      } else if (!req.body.text || req.body.text.length < 1 || !req.body.latitude || !req.body.longitude || !req.body.displayName) {
+        res.status(406);
+        res.send('valid user, text, latitude, and logitude required');
       } else {
         // if no name then anonymous just for dev purposes, to remove later!
         if(!req.body.displayName){
@@ -92,11 +90,10 @@ module.exports = {
         })
         .then((result)=>{
           if(!result){
-            console.log('Username not valid');
-            res.sendStatus(400);
+          res.status(400);
+          res.send('Username not valid');
           // create message
           } else {
-
             db.Messages.create({
               text: req.body.text,
               latitude: req.body.latitude,
@@ -121,7 +118,8 @@ module.exports = {
               })
             })
             .then(() => {
-              res.sendStatus(201);
+              res.status(201);
+              res.send('messsage posted');
             });
           }
         });
@@ -273,7 +271,7 @@ module.exports = {
                 res.status(400);
                 res.send('User name already taken');
               } else {
-                db.Users.findOrCreate({
+                db.Users.create({
                   where: {
                     displayName: req.body.displayName,
                     userAuth: req.body.userAuth
@@ -305,6 +303,6 @@ module.exports = {
           res.send('user display name required');
         }
       })
-    } //users/get
+    }
   }
 };
