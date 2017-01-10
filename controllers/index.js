@@ -254,8 +254,8 @@ module.exports = {
           displayName: req.body.displayName,
         }
       })
-      .then((result)=>{
-        if(!!result){
+      .then((user)=>{
+        if(!!user){
           console.log('Username taken: ', req.body.displayName);
           res.sendStatus(400);
         } else {
@@ -273,6 +273,25 @@ module.exports = {
       .then(()=>{
         res.sendStatus(201);
       });
-    }
+    },
+    get: function(req, res) {
+      db.Users.find({
+        where: {
+          userAuth: req.query.userAuth
+        }
+      })
+      .then((user)=>{
+        if(!user){
+          res.status(400);
+          res.send('user not on database');
+        } else if (user.displayName){
+          res.status(200);
+          res.send(user.displayName);
+        } else {
+          res.status(204);
+          res.send('user display name required');
+        }
+      })
+    } //users/get
   }
 };
