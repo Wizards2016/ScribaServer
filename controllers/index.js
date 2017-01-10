@@ -259,6 +259,7 @@ module.exports = {
   }, //votes
   users:{
     post: function(req, res) {
+      console.log(typeof req.body.displayName);
       if(!req.body.displayName || !req.body.userAuth){
         res.status(400);
         res.send('userAuth and UserDisplayName requried');
@@ -284,10 +285,8 @@ module.exports = {
                 res.send('User name already taken');
               } else {
                 db.Users.create({
-                  where: {
-                    displayName: req.body.displayName,
-                    userAuth: req.body.userAuth
-                  }
+                  displayName: req.body.displayName,
+                  userAuth: req.body.userAuth
                 });
                 res.status(201);
                 res.send('New user created');
@@ -304,6 +303,7 @@ module.exports = {
         }
       })
       .then((user)=>{
+        console.log(typeof req.query);
         if(!user){
           res.status(400);
           res.send('user not on database');
@@ -314,7 +314,7 @@ module.exports = {
           res.status(204);
           res.send('user display name required');
         }
-      })
+      });
     }
   }
 };
