@@ -4,14 +4,18 @@ const Sequelize = require('sequelize');
 const sequelize = new Sequelize('scribedb', 'root', '');
 const Models = require('../db');
 const request = require('request');
-const server = require('../server');
+// const server = require('../server');
 const baseUrl = 'http://127.0.0.1:8000';
+
+const messagesURL = `${baseUrl}/messages`;
+const usersURL = `${baseUrl}/users`;
+const votesURL = `${baseUrl}/votes`;
 
 xdescribe('Server', () => {
   it('Send a status of 200 when requesting to /messages', (done) => {
     request({
       method: 'GET',
-      url: `${baseUrl}/messages`
+      url: messagesURL
     }, (error, response) => {
       expect(response.statusCode).to.equal(200);
     });
@@ -21,7 +25,7 @@ xdescribe('Server', () => {
   xit('Send a status of 200 when requesting to /users', (done) => {
     request({
       method: 'GET',
-      url: `${baseUrl}/users`
+      url: usersURL
     }, (error, response) => {
       expect(response.statusCode).to.equal(200);
     });
@@ -31,7 +35,7 @@ xdescribe('Server', () => {
   xit('Send a status of 200 when requesting to /votes', (done) => {
     request({
       method: 'GET',
-      url: `${baseUrl}/votes`
+      url: votesURL
     }, (error, response) => {
       expect(response.statusCode).to.equal(200);
     });
@@ -62,8 +66,6 @@ describe('API & Database', () => {
   });
 
   xdescribe('MESSAGES', () => {
-    const messagesURL = `${baseUrl}/messages`;
-
     const messages = [{
       text: 'Yard Sale!',
       latitude: 37.3323314,
@@ -280,11 +282,20 @@ describe('API & Database', () => {
     });
   });
 
-  describe('USERS', () => {
-    const usersURL = `${baseUrl}/users`;
-
+  xdescribe('USERS', () => {
     xdescribe('GET', () => {
-
+      it('Returns the user with the given userAuth', (done) => {
+        request({
+          method: 'GET',
+          url: usersURL,
+          json: {
+            displayName: 'Fantine',
+            userAuth: '0000000000'
+          }
+        }, (error, response, body) => {
+          done();
+        });
+      });
     });
 
     describe('POST', () => {
@@ -292,6 +303,13 @@ describe('API & Database', () => {
         // Empty the Users table before each test
         Models.Users.destroy({
           where: {}
+        })
+        .then(() => {
+          // Create a new user
+          Models.Users.create({
+            displayName: 'Fantine',
+            userAuth: '0000000000'
+          });
         })
         .then(() => {
           done();
@@ -309,12 +327,266 @@ describe('API & Database', () => {
         }, (error, response, body) => {
           expect(response.statusCode).to.equal(201);
           expect(body).to.equal('New user created');
-
           done();
         });
       });
 
+      it('Should not create a user if the displayName is taken', (done) => {
+        request({
+          method: 'POST',
+          url: usersURL,
+          json: {
+            displayName: 'Fantine',
+            userAuth: 'google123456'
+          }
+        }, (error, response, body) => {
+          expect(response.statusCode).to.equal(400);
+          expect(body).to.equal('User name already taken');
+          done();
+        });
+      });
+    });
+  });
 
+  describe('VOTES', () => {
+
+    let messageID;
+
+    beforeEach((done) => {
+      Models.Votes.destroy({
+        where: {}
+      })
+      .then(() => {
+        // Create a user
+        return Models.Users.create({
+          displayName: 'Fantine',
+          userAuth: '0000000000'
+        });
+      })
+      .then(() => {
+        // Create a second user
+        return Models.Users.create({
+          displayName: 'Jean Valjean',
+          userAuth: '1234567890'
+        });
+      })
+      .then(() => {
+        // Create a message
+        request({
+          method: 'POST',
+          url: messagesURL,
+          json: {
+            text: 'My name is Jean Valjean!',
+            latitude: 37.3323314,
+            longitude: -122.0342186,
+            userAuth: '1234567890',
+            displayName: 'Jean Valjean'
+          }
+        }, (error, response, body) => {
+          Models.Messages.findAll({})
+            .then((results) => {
+              messageID = results[0].id;
+            })
+            .then(() => {
+              done();
+            });
+        });
+      });
+    });
+
+    xdescribe('GET', () => {
+
+    });
+
+    describe('POST', () => {
+      it('Create a new vote for a message by a user', (done) => {
+        request({
+          method: 'POST',
+          url: votesURL,
+          json: {
+            displayName: 'Fantine',
+            userAuth: '0000000000',
+            messageId: messageID,
+            vote: true
+          }
+        }, (error, response, body) => {
+          expect(response.statusCode).to.equal(201);
+          done();
+        });
+      });
+
+      it('Should not create a vote if incorrect user information is given', (done) => {
+        request({
+          method: 'POST',
+          url: votesURL,
+          json: {
+            displayName: 'Cosette',
+            userAuth: '0000000000',
+            messageId: messageID,
+            vote: true
+          }
+        }, (error, response, body) => {
+          expect(response.statusCode).to.equal(400);
+          expect(body).to.equal('user not valid');
+          done();
+        });
+      });
+
+      it('Changes a vote if it exists and the user votes differently', (done) => {
+        // Make an initial upvote
+        request({
+          method: 'POST',
+          url: votesURL,
+          json: {
+            displayName: 'Fantine',
+            userAuth: '0000000000',
+            messageId: messageID,
+            vote: true
+          }
+        }, (error, response, body) => {
+          // Check that there is an upvote for this message
+          Models.Votes.findAll({})
+            .then((results) => {
+              expect(results[0].vote).to.equal(true);
+            })
+            .then(() => {
+              // Make a downvote on the same message
+              request({
+                method: 'POST',
+                url: votesURL,
+                json: {
+                  displayName: 'Fantine',
+                  userAuth: '0000000000',
+                  messageId: messageID,
+                  vote: false
+                }
+              }, (error, response, body) => {
+                // Check that there is a downvote for this message
+                Models.Votes.findAll({})
+                  .then((results) => {
+                    expect(results[0].vote).to.equal(false);
+                    done();
+                  });
+              });
+            });
+        });
+      });
+
+      it('Deletes an existing vote', (done) => {
+        // Make an initial vote
+        request({
+          method: 'POST',
+          url: votesURL,
+          json: {
+            displayName: 'Fantine',
+            userAuth: '0000000000',
+            messageId: messageID,
+            vote: true
+          }
+        }, (error, response, body) => {
+          // Check that the vote exists
+          Models.Votes.findAll({})
+            .then((results) => {
+              expect(results.length).to.equal(1);
+            })
+            .then(() => {
+              // Delete the vote
+              request({
+                method: 'POST',
+                url: votesURL,
+                json: {
+                  delete: true,
+                  displayName: 'Fantine',
+                  userAuth: '0000000000',
+                  messageId: messageID
+                }
+              }, (error, response, body) => {
+                // Check that there are no votes in the database
+                Models.Votes.findAll({})
+                  .then((results) => {
+                    expect(results.length).to.equal(0);
+                    done();
+                  });
+              });
+            });
+        });
+      });
+
+      it('When a vote is posted, the messages table is also updated', (done) => {
+        // Check that the message has 0 upvotes and 0 downvotes
+        Models.Messages.findOne({
+          where: {
+            id: messageID
+          }
+        })
+        .then((message) => {
+          expect(message.dataValues.upVotes).to.equal(0);
+          expect(message.dataValues.downVotes).to.equal(0);
+        })
+        .then(() => {
+          // Create a new vote
+          request({
+            method: 'POST',
+            url: votesURL,
+            json: {
+              displayName: 'Fantine',
+              userAuth: '0000000000',
+              messageId: messageID,
+              vote: true
+            }
+          }, (error, response, body) => {
+            // Check that the message has 1 upvote and 0 downvotes
+            Models.Messages.findOne({
+              where: {
+                id: messageID
+              }
+            })
+            .then((message) => {
+              expect(message.dataValues.upVotes).to.equal(1);
+              expect(message.dataValues.downVotes).to.equal(0);
+              done();
+            });
+          });
+        });
+      });
+
+      it('When a vote is posted, the users table is also updated', (done) => {
+        // Check that the user has 0 upvotes and 0 downvotes
+        Models.Users.findOne({
+          where: {
+            displayName: 'Jean Valjean'
+          }
+        })
+        .then((user) => {
+          expect(user.dataValues.upVotes).to.equal(0);
+          expect(user.dataValues.downVotes).to.equal(0);
+        })
+        .then(() => {
+          // Create a new vote
+          request({
+            method: 'POST',
+            url: votesURL,
+            json: {
+              displayName: 'Fantine',
+              userAuth: '0000000000',
+              messageId: messageID,
+              vote: true
+            }
+          }, (error, response, body) => {
+            // Check that the user has 1 upvote and 0 downvotes
+            Models.Users.findOne({
+              where: {
+                displayName: 'Jean Valjean'
+              }
+            })
+            .then((user) => {
+              expect(user.dataValues.upVotes).to.equal(1);
+              expect(user.dataValues.downVotes).to.equal(0);
+              done();
+            });
+          });
+        });
+      });
     });
   });
 });

@@ -240,6 +240,7 @@ module.exports = {
                   })
                   .then((message)=>{
                     // update user vote totals
+                    console.log('=====================================================:', message.dataValues);
                     db.Users.update({
                         upVotes: message.dataValues.upVotes + upvoteDif,
                         downVotes: message.dataValues.downVotes + downvoteDif
@@ -293,7 +294,6 @@ module.exports = {
                 res.status(400);
                 res.send('User name already taken');
               } else {
-                console.log('=========================req.body:', req.body.userAuth);
                 db.Users.create({
                   displayName: req.body.displayName,
                   userAuth: req.body.userAuth
