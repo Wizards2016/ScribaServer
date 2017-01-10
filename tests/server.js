@@ -42,6 +42,7 @@ xdescribe('Server', () => {
 describe('API & Database', () => {
 
   beforeEach((done) => {
+    // Empty the messages, users, and votes table before the MESSAGES, USERS, and VOTES tests
     Models.Messages.destroy({
       where: {}
     })
@@ -85,7 +86,7 @@ describe('API & Database', () => {
 
     describe('GET', () => {
       beforeEach((done) => {
-        // Empty the Messages table
+        // Empty the messages table
         Models.Messages.destroy({
           where: {}
         })
@@ -130,6 +131,7 @@ describe('API & Database', () => {
 
     describe('POST', () => {
       beforeEach((done) => {
+        // Empty the users and messages tables before each post test
         Models.Users.destroy({
           where: {}
         })
@@ -139,6 +141,7 @@ describe('API & Database', () => {
           });
         })
         .then(() => {
+          // Create a user before each post test
           Models.Users.create({
             displayName: 'Jean Valjean',
             userAuth: '1234567890'
@@ -278,7 +281,39 @@ describe('API & Database', () => {
   });
 
   describe('USERS', () => {
-    beforeEach((done) => {
+    const usersURL = `${baseUrl}/users`;
+
+    xdescribe('GET', () => {
+
+    });
+
+    describe('POST', () => {
+      beforeEach((done) => {
+        // Empty the Users table before each test
+        Models.Users.destroy({
+          where: {}
+        })
+        .then(() => {
+          done();
+        });
+      });
+
+      it('Create a new user', (done) => {
+        request({
+          method: 'POST',
+          url: usersURL,
+          json: {
+            displayName: 'Javert',
+            userAuth: '0987654321'
+          }
+        }, (error, response, body) => {
+          expect(response.statusCode).to.equal(201);
+          expect(body).to.equal('New user created');
+
+          done();
+        });
+      });
+
 
     });
   });

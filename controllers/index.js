@@ -293,6 +293,7 @@ module.exports = {
                 res.status(400);
                 res.send('User name already taken');
               } else {
+                console.log('=========================req.body:', req.body.userAuth);
                 db.Users.create({
                   displayName: req.body.displayName,
                   userAuth: req.body.userAuth
