@@ -309,7 +309,7 @@ module.exports = {
           res.send('user not on database');
         } else if (user.displayName){
           res.status(200);
-          res.send(user.displayName);
+          res.json({status: 200, displayName: user.displayName});
         } else {
           res.status(204);
           res.send('user display name required');
