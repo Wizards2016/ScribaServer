@@ -129,6 +129,18 @@ module.exports = {
     }
   },
   votes: {
+    get: function(req, res){
+      db.Votes.find({
+        where: {
+          UserDisplayName: req.query.displayName,
+          MessageId: parseInt(req.query.messageId)
+        }
+      })
+      .then((vote) => {
+        console.log(vote);
+        res.json(vote);
+      });
+    },
     post: function(req, res) {
       // validate user
       db.Users.find({
