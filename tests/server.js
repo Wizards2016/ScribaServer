@@ -4,14 +4,14 @@ const Sequelize = require('sequelize');
 const sequelize = new Sequelize('scribedb', 'root', '');
 const Models = require('../db');
 const request = require('request');
-// const server = require('../server');
+const server = require('../server');
 const baseUrl = 'http://127.0.0.1:8000';
 
 const messagesURL = `${baseUrl}/messages`;
 const usersURL = `${baseUrl}/users`;
 const votesURL = `${baseUrl}/votes`;
 
-xdescribe('Server', () => {
+describe('Server', () => {
   it('Send a status of 200 when requesting to /messages', (done) => {
     request({
       method: 'GET',
@@ -65,7 +65,7 @@ describe('API & Database', () => {
     });
   });
 
-  xdescribe('MESSAGES', () => {
+  describe('MESSAGES', () => {
     const messages = [{
       text: 'Yard Sale!',
       latitude: 37.3323314,
@@ -93,38 +93,37 @@ describe('API & Database', () => {
           where: {}
         })
         .then(() => {
-          done();
+          // Create messages
+          messages.forEach((message, index) => {
+            Models.Messages.create(message)
+              .then(() => {
+                if (index === messages.length - 1) {
+                  done();
+                }
+              });
+          });
         });
       });
 
       it('Get all messages if latitude and longitude are not specified', (done) => {
-        messages.forEach((message, index) => {
-          Models.Messages.create(message)
-            .then(() => {
-              if (index === messages.length - 1) {
-                request({
-                  method: 'GET',
-                  url: messagesURL
-                }, (error, response, body) => {
-                  expect(JSON.parse(body).length).to.equal(2);
-                  done();
-                });
-              }
-            });
+        request({
+          method: 'GET',
+          url: messagesURL
+        }, (error, response, body) => {
+          expect(JSON.parse(body).length).to.equal(2);
+          done();
         });
       });
 
-      // TODO: How to send data along with a get request?
-      xit('Get nearby messages if latitude and longitude are specified', (done) => {
+      it('Get nearby messages if latitude and longitude are specified', (done) => {
         request({
           method: 'GET',
           url: messagesURL,
-          json: {
+          qs: {
             latitude: 37,
             longitude: -122.0342186
           }
         }, (error, response, body) => {
-          // console.log('========================================', response);
           expect(JSON.parse(body).length).to.equal(1);
           done();
         });
@@ -282,18 +281,24 @@ describe('API & Database', () => {
     });
   });
 
-  xdescribe('USERS', () => {
-    xdescribe('GET', () => {
-      it('Returns the user with the given userAuth', (done) => {
-        request({
-          method: 'GET',
-          url: usersURL,
-          json: {
-            displayName: 'Fantine',
-            userAuth: '0000000000'
-          }
-        }, (error, response, body) => {
-          done();
+  describe('USERS', () => {
+    describe('GET', () => {
+      it('Returns the user\'s display name when given userAuth', (done) => {
+        Models.Users.create({
+          displayName: 'Fantine',
+          userAuth: '0000000000',
+        })
+        .then(() => {
+          request({
+            method: 'GET',
+            url: usersURL,
+            qs: {
+              userAuth: '0000000000'
+            }
+          }, (error, response, body) => {
+            expect(response.statusCode).to.equal(200);
+            done();
+          });
         });
       });
     });
@@ -394,8 +399,36 @@ describe('API & Database', () => {
       });
     });
 
-    xdescribe('GET', () => {
-
+    describe('GET', () => {
+      it('Gets the vote made by a user on a certain message', (done) => {
+        // Make a vote on a message
+        request({
+          method: 'POST',
+          url: votesURL,
+          json: {
+            displayName: 'Fantine',
+            userAuth: '0000000000',
+            messageId: messageID,
+            vote: true
+          }
+        }, (error, response, body) => {
+          // Get the votes from the database
+          request({
+            method: 'GET',
+            url: votesURL,
+            qs: {
+              displayName: 'Fantine',
+              messageId: messageID
+            }
+          }, (error, response, body) => {
+            const parsedBody = JSON.parse(body);
+            expect(parsedBody.vote).to.equal(true);
+            // Note the capitalization
+            expect(parsedBody.MessageId).to.equal(messageID);
+            done();
+          });
+        });
+      });
     });
 
     describe('POST', () => {
