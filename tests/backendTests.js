@@ -45,10 +45,10 @@ describe('API & Database', () => {
   before((done) => {
     Models.Users.sync()
       .then(() => {
-        Models.Messages.sync();
+        return Models.Messages.sync();
       })
       .then(() => {
-        Models.Votes.sync();
+        return Models.Votes.sync();
       })
       .then(() => {
         done();
@@ -61,12 +61,12 @@ describe('API & Database', () => {
       where: {}
     })
     .then(() => {
-      Models.Users.destroy({
+      return Models.Users.destroy({
         where: {}
       });
     })
     .then(() => {
-      Models.Votes.destroy({
+      return Models.Votes.destroy({
         where: {}
       });
     })
@@ -77,17 +77,17 @@ describe('API & Database', () => {
 
   describe('MESSAGES', () => {
     const messages = [{
-      text: 'Yard Sale!',
+      text: 'Who am I?',
       latitude: 37.3323314,
       longitude: -122.0342186,
-      userAuth: 'Thomas Cruise',
-      displayName: 'ThomasCruise'
+      userAuth: '24601',
+      displayName: 'Jean Valjean'
     }, {
-      text: 'Free couch',
+      text: 'You\'re Jean Valjean . . .',
       latitude: 39.5344314,
       longitude: -122.0336186,
-      userAuth: 'Thomas Cruise',
-      displayName: 'ThomasCruise'
+      userAuth: '123123123',
+      displayName: 'Marius'
     }];
 
     const position = {
@@ -152,7 +152,7 @@ describe('API & Database', () => {
           // Create a user before each post test
           Models.Users.create({
             displayName: 'Jean Valjean',
-            userAuth: '1234567890'
+            userAuth: '24601'
           });
         })
         .then(() => {
@@ -169,7 +169,7 @@ describe('API & Database', () => {
             latitude: 39.5344314,
             longitude: 122.0336186,
             displayName: 'Jean Valjean',
-            userAuth: '1234567890'
+            userAuth: '24601'
           }
         }, (error, response) => {
           expect(response.statusCode).to.equal(201);
@@ -187,7 +187,7 @@ describe('API & Database', () => {
             latitude: 39.5344314,
             longitude: 122.0336186,
             displayName: 'Jean Valjean',
-            userAuth: '1234567890'
+            userAuth: '24601'
           }
         }, () => {
           // Get the id of the message that was posted
@@ -204,7 +204,7 @@ describe('API & Database', () => {
                 delete: true,
                 id: messageID,
                 displayName: 'Jean Valjean',
-                userAuth: '1234567890'
+                userAuth: '24601'
               }
             }, () => {
               // Check that the message was deleted
@@ -230,7 +230,7 @@ describe('API & Database', () => {
             latitude: 39.5344314,
             longitude: 122.0336186,
             displayName: 'Jean Valjean',
-            userAuth: '1234567890'
+            userAuth: '24601'
           }
         }, () => {
           // Check that the message was not posted
@@ -252,7 +252,7 @@ describe('API & Database', () => {
           json: {
             text: 'Hello world',
             displayName: 'Jean Valjean',
-            userAuth: '1234567890'
+            userAuth: '24601'
           }
         }, () => {
           // Check that the message was not posted
@@ -276,7 +276,7 @@ describe('API & Database', () => {
             latitude: 39.5344314,
             longitude: 122.0336186,
             displayName: 'Jean Valjohn',
-            userAuth: '1234567890'
+            userAuth: '24601'
           }
         }, (error, response) => {
           // Check that the message was not posted
@@ -292,14 +292,14 @@ describe('API & Database', () => {
       it('Returns the user\'s display name when given userAuth', (done) => {
         Models.Users.create({
           displayName: 'Fantine',
-          userAuth: '0000000000'
+          userAuth: '123456789'
         })
         .then(() => {
           request({
             method: 'GET',
             url: usersURL,
             qs: {
-              userAuth: '0000000000'
+              userAuth: '123456789'
             }
           }, (error, response) => {
             expect(response.statusCode).to.equal(200);
@@ -319,7 +319,7 @@ describe('API & Database', () => {
           // Create a new user
           Models.Users.create({
             displayName: 'Fantine',
-            userAuth: '0000000000'
+            userAuth: '123456789'
           });
         })
         .then(() => {
@@ -370,14 +370,14 @@ describe('API & Database', () => {
         // Create a user
         Models.Users.create({
           displayName: 'Fantine',
-          userAuth: '0000000000'
+          userAuth: '123456789'
         });
       })
       .then(() => {
         // Create a second user
         Models.Users.create({
           displayName: 'Jean Valjean',
-          userAuth: '1234567890'
+          userAuth: '24601'
         });
       })
       .then(() => {
@@ -389,7 +389,7 @@ describe('API & Database', () => {
             text: 'My name is Jean Valjean!',
             latitude: 37.3323314,
             longitude: -122.0342186,
-            userAuth: '1234567890',
+            userAuth: '24601',
             displayName: 'Jean Valjean'
           }
         }, () => {
@@ -412,7 +412,7 @@ describe('API & Database', () => {
           url: votesURL,
           json: {
             displayName: 'Fantine',
-            userAuth: '0000000000',
+            userAuth: '123456789',
             messageId: messageID,
             vote: true
           }
@@ -443,7 +443,7 @@ describe('API & Database', () => {
           url: votesURL,
           json: {
             displayName: 'Fantine',
-            userAuth: '0000000000',
+            userAuth: '123456789',
             messageId: messageID,
             vote: true
           }
@@ -459,7 +459,7 @@ describe('API & Database', () => {
           url: votesURL,
           json: {
             displayName: 'Cosette',
-            userAuth: '0000000000',
+            userAuth: '123456789',
             messageId: messageID,
             vote: true
           }
@@ -477,7 +477,7 @@ describe('API & Database', () => {
           url: votesURL,
           json: {
             displayName: 'Fantine',
-            userAuth: '0000000000',
+            userAuth: '123456789',
             messageId: messageID,
             vote: true
           }
@@ -494,7 +494,7 @@ describe('API & Database', () => {
                 url: votesURL,
                 json: {
                   displayName: 'Fantine',
-                  userAuth: '0000000000',
+                  userAuth: '123456789',
                   messageId: messageID,
                   vote: false
                 }
@@ -517,7 +517,7 @@ describe('API & Database', () => {
           url: votesURL,
           json: {
             displayName: 'Fantine',
-            userAuth: '0000000000',
+            userAuth: '123456789',
             messageId: messageID,
             vote: true
           }
@@ -535,7 +535,7 @@ describe('API & Database', () => {
                 json: {
                   delete: true,
                   displayName: 'Fantine',
-                  userAuth: '0000000000',
+                  userAuth: '123456789',
                   messageId: messageID
                 }
               }, () => {
@@ -568,7 +568,7 @@ describe('API & Database', () => {
             url: votesURL,
             json: {
               displayName: 'Fantine',
-              userAuth: '0000000000',
+              userAuth: '123456789',
               messageId: messageID,
               vote: true
             }
@@ -606,7 +606,7 @@ describe('API & Database', () => {
             url: votesURL,
             json: {
               displayName: 'Fantine',
-              userAuth: '0000000000',
+              userAuth: '123456789',
               messageId: messageID,
               vote: true
             }
