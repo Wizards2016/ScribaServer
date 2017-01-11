@@ -213,6 +213,8 @@ module.exports = {
                       MessageId: req.body.messageId
                     })
                     boolVote == true ? upvoteDif+=1 : downvoteDif+=1;
+                    res.status(201);
+                    res.send('vote created');
                   // if vote found, then update
                   } else {
                     db.Votes.update({vote: boolVote},{
@@ -223,6 +225,8 @@ module.exports = {
                     });
                     vote.dataValues.vote ? upvoteDif-- : downvoteDif--;
                     boolVote ? upvoteDif++ : downvoteDif++;
+                    res.status(201);
+                    res.send('vote updated');
                   }
                   // update message stats
                   db.Messages.update({
@@ -248,10 +252,6 @@ module.exports = {
                         displayName: message.dataValues.UserDisplayName
                       }
                     })
-                    .then(()=>{
-                    res.status(201);
-                    res.send('vote recorded');
-                    });
                   }); //then message for user stats
                 } // else !(vote && vote.dataValues.vote == boolVote)
               }); // then vote
