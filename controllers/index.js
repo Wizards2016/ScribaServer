@@ -218,7 +218,7 @@ module.exports = {
                       UserDisplayName: req.body.displayName,
                       MessageId: req.body.messageId
                     })
-                    boolVote == true ? (upvoteDif +=1) : (downvoteDif +=1);
+                    boolVote == true ? (upvoteDif += 1) : (downvoteDif += 1);
                     res.status(201);
                     res.send('vote created');
                   // if vote found, then update
@@ -242,23 +242,23 @@ module.exports = {
                     where: {
                       id: req.body.messageId
                     }
-                  });
-                  db.Messages.find({
-                    where: {
-                      id: req.body.messageId
-                    }
                   })
-                  .then((message) => {
-                    // update user vote totals
-                    db.Users.update({
-                      upVotes: message.dataValues.upVotes + upvoteDif,
-                      downVotes: message.dataValues.downVotes + downvoteDif
-                    }, {
+                    db.Users.find({
                       where: {
                         displayName: message.dataValues.UserDisplayName
                       }
                     })
-                  }); //then message for user stats
+                    .then((author) => {
+                      // update user vote totals
+                      db.Users.update({
+                        upVotes: author.dataValues.upVotes + upvoteDif,
+                        downVotes: author.dataValues.downVotes + downvoteDif
+                      }, {
+                        where: {
+                          displayName: message.dataValues.UserDisplayName
+                        }
+                      })
+                    }); // then message for user stats
                 } // else !(vote && vote.dataValues.vote == boolVote)
               }); // then vote
             } else {
