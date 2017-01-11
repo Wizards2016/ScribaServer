@@ -5,7 +5,7 @@ module.exports = function (grunt) {
       options: {
         configFile: '.eslintrc'
       },
-      target: ['**/*.js', '!Gruntfile.js', '!node_modules/**/*.js', '!seed.js']
+      target: ['**/*.js', '!Gruntfile.js', '!node_modules/**/*.js']
     },
     mochaTest: {
       test: {
@@ -47,6 +47,6 @@ module.exports = function (grunt) {
                     grunt test: Run eslint, run server and database tests`);
   });
   grunt.registerTask('lint', ['eslint']);
-  grunt.registerTask('test', ['eslint', 'mochaTest']);
+  grunt.registerTask('test', ['mochaTest']);
   grunt.registerTask('db', ['shell:database']);
 };
