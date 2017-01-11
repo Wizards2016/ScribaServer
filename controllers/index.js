@@ -219,6 +219,8 @@ module.exports = {
                       MessageId: req.body.messageId
                     });
                     boolVote === true ? (upvoteDif += 1) : (downvoteDif += 1);
+                    res.status(201);
+                    res.send('vote created');
                   // if vote found, then update
                   } else {
                     db.Votes.update({ vote: boolVote }, {
@@ -229,6 +231,8 @@ module.exports = {
                     });
                     vote.dataValues.vote ? (upvoteDif -= 1) : (downvoteDif -= 1);
                     boolVote ? (upvoteDif += 1) : (downvoteDif += 1);
+                    res.status(201);
+                    res.send('vote updated');
                   }
                   // update message stats
                   db.Messages.update({
@@ -239,24 +243,20 @@ module.exports = {
                       id: req.body.messageId
                     }
                   });
-                  db.Messages.find({
+                  db.Users.find({
                     where: {
-                      id: req.body.messageId
+                      displayName: message.dataValues.UserDisplayName
                     }
                   })
-                  .then((message) => {
+                  .then((author) => {
                     // update user vote totals
                     db.Users.update({
-                      upVotes: message.dataValues.upVotes + upvoteDif,
-                      downVotes: message.dataValues.downVotes + downvoteDif
+                      upVotes: author.dataValues.upVotes + upvoteDif,
+                      downVotes: author.dataValues.downVotes + downvoteDif
                     }, {
                       where: {
                         displayName: message.dataValues.UserDisplayName
                       }
-                    })
-                    .then(() => {
-                      res.status(201);
-                      res.send('vote recorded');
                     });
                   }); // then message for user stats
                 } // else !(vote && vote.dataValues.vote == boolVote)
