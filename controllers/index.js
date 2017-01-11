@@ -35,7 +35,10 @@ module.exports = {
     },
     post: function (req, res) {
       // post delete request
-      if (req.body.delete === true) {
+      if(!req.body.id) {
+        res.status(400);
+        res.send('id for valid message required');
+      } else if (req.body.delete === true) {
         db.Messages.find({
           where: {
             id: parseInt(req.body.id)
