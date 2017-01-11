@@ -52,7 +52,7 @@ db.Users.sync()
   });
 })
 .then(() => {
-  db.Messages.create({
+  return db.Messages.create({
     text: 'Dog found',
     latitude: 37.3303316,
     longitude: -122.0332196,
