@@ -1,14 +1,14 @@
 const expect = require('chai').expect;
-const Models = require('../db');
+const Models = require('../db/index');
 const request = require('request');
 const server = require('../server');
-const baseUrl = 'http://127.0.0.1:8000';
+const baseUrl = 'http://localhost:8000';
 
 const messagesURL = `${baseUrl}/messages`;
 const usersURL = `${baseUrl}/users`;
 const votesURL = `${baseUrl}/votes`;
 
-describe('Server', () => {
+xdescribe('Server', () => {
   it('Send a status of 200 when requesting to /messages', (done) => {
     request({
       method: 'GET',
@@ -19,7 +19,7 @@ describe('Server', () => {
     done();
   });
 
-  xit('Send a status of 200 when requesting to /users', (done) => {
+  it('Send a status of 200 when requesting to /users', (done) => {
     request({
       method: 'GET',
       url: usersURL
@@ -29,7 +29,7 @@ describe('Server', () => {
     done();
   });
 
-  xit('Send a status of 200 when requesting to /votes', (done) => {
+  it('Send a status of 200 when requesting to /votes', (done) => {
     request({
       method: 'GET',
       url: votesURL
@@ -41,6 +41,20 @@ describe('Server', () => {
 });
 
 describe('API & Database', () => {
+  // Create the tables
+  before((done) => {
+    Models.Users.sync()
+      .then(() => {
+        Models.Messages.sync();
+      })
+      .then(() => {
+        Models.Votes.sync();
+      })
+      .then(() => {
+        done();
+      });
+  });
+
   beforeEach((done) => {
     // Empty the messages, users, and votes table before the MESSAGES, USERS, and VOTES tests
     Models.Messages.destroy({
