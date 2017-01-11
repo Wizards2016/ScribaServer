@@ -1,7 +1,4 @@
 const expect = require('chai').expect;
-const assert = require('chai').assert;
-const Sequelize = require('sequelize');
-const sequelize = new Sequelize('scribedb', 'root', '');
 const Models = require('../db');
 const request = require('request');
 const server = require('../server');
@@ -44,7 +41,6 @@ describe('Server', () => {
 });
 
 describe('API & Database', () => {
-
   beforeEach((done) => {
     // Empty the messages, users, and votes table before the MESSAGES, USERS, and VOTES tests
     Models.Messages.destroy({
@@ -119,10 +115,7 @@ describe('API & Database', () => {
         request({
           method: 'GET',
           url: messagesURL,
-          qs: {
-            latitude: 37,
-            longitude: -122.0342186
-          }
+          qs: position
         }, (error, response, body) => {
           expect(JSON.parse(body).length).to.equal(1);
           done();
@@ -154,7 +147,6 @@ describe('API & Database', () => {
       });
 
       it('Post a message', (done) => {
-
         request({
           method: 'POST',
           url: messagesURL,
@@ -165,7 +157,7 @@ describe('API & Database', () => {
             displayName: 'Jean Valjean',
             userAuth: '1234567890'
           }
-        }, (error, response, body) => {
+        }, (error, response) => {
           expect(response.statusCode).to.equal(201);
           done();
         });
@@ -183,7 +175,7 @@ describe('API & Database', () => {
             displayName: 'Jean Valjean',
             userAuth: '1234567890'
           }
-        }, (error, response, body) => {
+        }, () => {
           // Get the id of the message that was posted
           request({
             method: 'GET',
@@ -200,7 +192,7 @@ describe('API & Database', () => {
                 displayName: 'Jean Valjean',
                 userAuth: '1234567890'
               }
-            }, (error, response, body) => {
+            }, () => {
               // Check that the message was deleted
               request({
                 method: 'GET',
@@ -226,7 +218,7 @@ describe('API & Database', () => {
             displayName: 'Jean Valjean',
             userAuth: '1234567890'
           }
-        }, (error, response, body) => {
+        }, () => {
           // Check that the message was not posted
           request({
             method: 'GET',
@@ -248,7 +240,7 @@ describe('API & Database', () => {
             displayName: 'Jean Valjean',
             userAuth: '1234567890'
           }
-        }, (error, response, body) => {
+        }, () => {
           // Check that the message was not posted
           request({
             method: 'GET',
@@ -272,7 +264,7 @@ describe('API & Database', () => {
             displayName: 'Jean Valjohn',
             userAuth: '1234567890'
           }
-        }, (error, response, body) => {
+        }, (error, response) => {
           // Check that the message was not posted
           expect(response.statusCode).to.equal(400);
           done();
@@ -286,7 +278,7 @@ describe('API & Database', () => {
       it('Returns the user\'s display name when given userAuth', (done) => {
         Models.Users.create({
           displayName: 'Fantine',
-          userAuth: '0000000000',
+          userAuth: '0000000000'
         })
         .then(() => {
           request({
@@ -295,7 +287,7 @@ describe('API & Database', () => {
             qs: {
               userAuth: '0000000000'
             }
-          }, (error, response, body) => {
+          }, (error, response) => {
             expect(response.statusCode).to.equal(200);
             done();
           });
@@ -354,7 +346,6 @@ describe('API & Database', () => {
   });
 
   describe('VOTES', () => {
-
     let messageID;
 
     beforeEach((done) => {
@@ -363,14 +354,14 @@ describe('API & Database', () => {
       })
       .then(() => {
         // Create a user
-        return Models.Users.create({
+        Models.Users.create({
           displayName: 'Fantine',
           userAuth: '0000000000'
         });
       })
       .then(() => {
         // Create a second user
-        return Models.Users.create({
+        Models.Users.create({
           displayName: 'Jean Valjean',
           userAuth: '1234567890'
         });
@@ -387,7 +378,7 @@ describe('API & Database', () => {
             userAuth: '1234567890',
             displayName: 'Jean Valjean'
           }
-        }, (error, response, body) => {
+        }, () => {
           Models.Messages.findAll({})
             .then((results) => {
               messageID = results[0].id;
@@ -411,7 +402,7 @@ describe('API & Database', () => {
             messageId: messageID,
             vote: true
           }
-        }, (error, response, body) => {
+        }, () => {
           // Get the votes from the database
           request({
             method: 'GET',
@@ -442,7 +433,7 @@ describe('API & Database', () => {
             messageId: messageID,
             vote: true
           }
-        }, (error, response, body) => {
+        }, (error, response) => {
           expect(response.statusCode).to.equal(201);
           done();
         });
@@ -476,7 +467,7 @@ describe('API & Database', () => {
             messageId: messageID,
             vote: true
           }
-        }, (error, response, body) => {
+        }, () => {
           // Check that there is an upvote for this message
           Models.Votes.findAll({})
             .then((results) => {
@@ -493,7 +484,7 @@ describe('API & Database', () => {
                   messageId: messageID,
                   vote: false
                 }
-              }, (error, response, body) => {
+              }, () => {
                 // Check that there is a downvote for this message
                 Models.Votes.findAll({})
                   .then((results) => {
@@ -516,7 +507,7 @@ describe('API & Database', () => {
             messageId: messageID,
             vote: true
           }
-        }, (error, response, body) => {
+        }, () => {
           // Check that the vote exists
           Models.Votes.findAll({})
             .then((results) => {
@@ -533,7 +524,7 @@ describe('API & Database', () => {
                   userAuth: '0000000000',
                   messageId: messageID
                 }
-              }, (error, response, body) => {
+              }, () => {
                 // Check that there are no votes in the database
                 Models.Votes.findAll({})
                   .then((results) => {
@@ -567,7 +558,7 @@ describe('API & Database', () => {
               messageId: messageID,
               vote: true
             }
-          }, (error, response, body) => {
+          }, () => {
             // Check that the message has 1 upvote and 0 downvotes
             Models.Messages.findOne({
               where: {
@@ -605,7 +596,7 @@ describe('API & Database', () => {
               messageId: messageID,
               vote: true
             }
-          }, (error, response, body) => {
+          }, () => {
             // Check that the user has 1 upvote and 0 downvotes
             Models.Users.findOne({
               where: {
