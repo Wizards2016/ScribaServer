@@ -36,69 +36,69 @@ module.exports = {
     post: (req, res) => {
       // post delete request
       if (req.body.delete === true) {
-        if(!req.body.id) {
-         res.status(400);
+        if (!req.body.id) {
+          res.status(400);
           res.send('id for valid message required');
         } else {
           db.Messages.find({
             where: {
-              id: parseInt(req.body.id)
+              id: parseInt(req.body.id, 0)
             }
           })
-          .then((message)=>{
+          .then((message) => {
             // find if message exists with that displayName
-            if(message && message.UserDisplayName === req.body.displayName){
+            if (message && message.UserDisplayName === req.body.displayName) {
               db.Users.find({
                 where: {
                   displayName: req.body.displayName
                 }
-              }).then((user)=>{
-                if(user.userAuth === req.body.userAuth){
+              }).then((user) => {
+                if (user.userAuth === req.body.userAuth) {
                   // delete message
                   db.Messages.destroy({
-                      where: {
-                        id: parseInt(req.body.id)
-                      }
+                    where: {
+                      id: parseInt(req.body.id, 0)
+                    }
                   })
                   // update totalPosts of messages author
-                  .then(()=>{
+                  .then(() => {
                     db.Users.find({
                       where: {
                         displayName: req.body.displayName
                       }
                     })
-                    .then((user)=>{
-                      db.Users.update({totalPosts: user.dataValues.totalPosts-1}, {
+                    .then((user) => {
+                      db.Users.update({ totalPosts: user.dataValues.totalPosts - 1 }, {
                         where: {
-                      displayName: req.body.displayName
+                          displayName: req.body.displayName
                         }
-                      })
-                    })
+                      });
+                    });
                   })
                   .then(() => {
-                  res.status(200);
-                  res.send('message deleted');
-                  })
+                    res.status(200);
+                    res.send('message deleted');
+                  });
                 } else {
                   res.status(400);
                   res.send('userAuth wrong, users can only delete their own messages');
                 }
-              })
-            } else if (!message){
+              });
+            } else if (!message) {
               res.status(400);
               res.send('message not found');
             } else {
               res.status(400);
               res.send('displayName not associated with that message');
             }
-          })
+          });
         }
       // post message requires: text, lext.length, latitude, and logitude
       } else if (!req.body.text ||
-                req.body.text.length < 1 ||
-                !req.body.latitude ||
-                !req.body.longitude ||
-                !req.body.displayName) {
+                  req.body.text.length < 1 ||
+                  !req.body.latitude ||
+                  !req.body.longitude ||
+                  !req.body.displayName) {
         res.status(406);
         res.send('valid user, text, latitude, and logitude required');
       } else {
@@ -194,7 +194,9 @@ module.exports = {
                   res.send('vote already on record');
                 } else {
                   // delete vote
-                  if (req.body.delete || req.body.vote === undefined || req.body.vote === null) {
+                  if (req.body.delete ||
+                      req.body.vote === undefined ||
+                      req.body.vote === null) {
                     if (!vote) {
                       res.status(400);
                       res.send('vote to remove does not exist');
