@@ -7,9 +7,3 @@ services:
   - mysql
 before_script:
   - mysql -e 'CREATE DATABASE scribedb;'
-  - mysql -e 'CREATE TABLE scribedb.Messages (
-      id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
-      createdAt DATETIME NOT NULL,
-      updatedAt DATETIME NOT NULL,
-      text VARCHAR(255)
-    );'

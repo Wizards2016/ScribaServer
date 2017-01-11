@@ -4,9 +4,14 @@
     "comma-dangle": ["error", "never"],
     "import/newline-after-import": 0,
     "object-shorthand": ['error', 'consistent'],
-    "no-shadow": ["error", { "hoist": "functions", "allow": ["response"] }]
+    "no-shadow": ["warn", { "hoist": "functions", "allow": ["error", "response", "body"] }],
+    "no-param-reassign": ["warn", { "props": true }],
+    "no-unused-expressions": [2, { allowTernary: true }],
+    "no-unused-vars": ["warn"],
+    "arrow-body-style": ["error", "always"]
   },
   "env": {
-    "jasmine": true
+    "jasmine": true,
+    "mocha": true
   }
 }

@@ -47,15 +47,8 @@ const Users = db.define('Users', {
 });
 
 Messages.belongsTo(Users);
-Users.sync()
-.then(()=>{
-  Messages.sync()
-  .then(()=>{
-    Votes.belongsTo(Messages);
-    Votes.belongsTo(Users);
-    Votes.sync();
-  })
-});
+Votes.belongsTo(Messages);
+Votes.belongsTo(Users);
 
 exports.Votes = Votes;
 exports.Messages = Messages;
