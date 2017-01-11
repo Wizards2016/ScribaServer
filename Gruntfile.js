@@ -1,11 +1,11 @@
-module.exports = function (grunt) {
+module.exports = (grunt) => {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     eslint: {
       options: {
         configFile: '.eslintrc'
       },
-      target: ['**/*.js', '!Gruntfile.js', '!node_modules/**/*.js']
+      target: ['**/*.js', '!node_modules/**/*.js']
     },
     mochaTest: {
       test: {
@@ -44,7 +44,8 @@ module.exports = function (grunt) {
   grunt.registerTask('default', () => {
     grunt.log.write(`Options:
                     grunt lint: Run eslint
-                    grunt test: Run eslint, run server and database tests`);
+                    grunt test: Run eslint, run server and database tests
+                    grunt db: Drop and create database scribedb`);
   });
   grunt.registerTask('lint', ['eslint']);
   grunt.registerTask('test', ['eslint', 'mochaTest']);
