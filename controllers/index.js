@@ -35,7 +35,7 @@ module.exports = {
     },
     post: (req, res) => {
       // post delete request
-      if(!req.body.id) {
+      if (!req.body.id) {
         res.status(400);
         res.send('id for valid message required');
       } else if (req.body.delete === true) {
@@ -192,12 +192,12 @@ module.exports = {
                   res.send('vote already on record');
                 } else {
                   // delete vote
-                  if(req.body.delete || req.body.vote === undefined || req.body.vote === null){
-                    if(!vote){
+                  if (req.body.delete || req.body.vote === undefined || req.body.vote === null) {
+                    if (!vote) {
                       res.status(400);
                       res.send('vote to remove does not exist');
                     } else {
-                      vote.dataValues.vote ? upvoteDif-- : downvoteDif--;
+                      vote.dataValues.vote ? (upvoteDif -= 1) : (downvoteDif -= 1);
                       db.Votes.destroy({
                         where: {
                           UserDisplayName: req.body.displayName,
@@ -214,7 +214,7 @@ module.exports = {
                       UserDisplayName: req.body.displayName,
                       MessageId: req.body.messageId
                     });
-                    boolVote === true ? upvoteDif += 1 : downvoteDif += 1;
+                    boolVote === true ? (upvoteDif += 1) : (downvoteDif += 1);
                   // if vote found, then update
                   } else {
                     db.Votes.update({ vote: boolVote }, {
