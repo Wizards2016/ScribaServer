@@ -47,6 +47,6 @@ module.exports = function (grunt) {
                     grunt test: Run eslint, run server and database tests`);
   });
   grunt.registerTask('lint', ['eslint']);
-  grunt.registerTask('test', ['mochaTest']);
+  grunt.registerTask('test', ['eslint', 'mochaTest']);
   grunt.registerTask('db', ['shell:database']);
 };
