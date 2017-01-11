@@ -186,15 +186,20 @@ module.exports = {
                 } else {
                   // delete vote
                   if(req.body.delete || req.body.vote === undefined || req.body.vote === null){
-                    vote.dataValues.vote ? upvoteDif-- : downvoteDif--;
-                    db.Votes.destroy({
-                      where: {
-                        UserDisplayName: req.body.displayName,
-                        MessageId: req.body.messageId
-                      }
-                    });
-                    res.status(200);
-                    res.send('vote removed');
+                    if(!vote){
+                      res.status(400);
+                      res.send('vote to remove does not exist');
+                    } else {
+                      vote.dataValues.vote ? upvoteDif-- : downvoteDif--;
+                      db.Votes.destroy({
+                        where: {
+                          UserDisplayName: req.body.displayName,
+                          MessageId: req.body.messageId
+                        }
+                      });
+                      res.status(200);
+                      res.send('vote removed');
+                    }
                   // if vote not found, then create
                   } else if(!vote){
                     db.Votes.create({
