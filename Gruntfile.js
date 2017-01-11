@@ -5,7 +5,7 @@ module.exports = function (grunt) {
       options: {
         configFile: '.eslintrc'
       },
-      target: ['**/*.js', '!Gruntfile.js', '!node_modules/**/*.js']
+      target: ['**/*.js', '!Gruntfile.js', '!node_modules/**/*.js', '!seed.js']
     },
     mochaTest: {
       test: {

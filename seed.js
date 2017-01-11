@@ -1,15 +1,12 @@
 const db = require('./db/index.js');
-const Messages = db.Messages;
-const Users = db.Users;
-const Votes = db.Votes;
 
-Users.create({
+db.Users.create({
   displayName: 'ThomasCruise',
   userAuth: 'Thomas Cruise',
   upVotes: 1,
   downVotes: 1,
   totalPosts: 8
-}).then(function () {
+}).then(() => {
   db.Messages.create({
     text: 'Free couch',
     latitude: 37.3344314,
@@ -19,7 +16,7 @@ Users.create({
   });
 })
 .then(() => {
-  Messages.create({
+  return db.Messages.create({
     text: 'Lost my dog :\\',
     latitude: 37.3323314,
     longitude: -122.0333786,
@@ -28,7 +25,7 @@ Users.create({
   });
 })
 .then(() => {
-  Messages.create({
+  return db.Messages.create({
     text: 'Dog found',
     latitude: 37.3303316,
     longitude: -122.0332196,
@@ -37,7 +34,7 @@ Users.create({
   });
 })
 .then(() => {
-  Messages.create({
+  return db.Messages.create({
     text: 'Yard Sale!',
     latitude: 37.3323314,
     longitude: -122.0342186,
@@ -45,7 +42,7 @@ Users.create({
     UserDisplayName: 'ThomasCruise'
   });
 })
-.then(function () {
+.then(() => {
   return db.Messages.create({
     text: 'bus stop moved',
     latitude: 37.3303314,
@@ -56,7 +53,7 @@ Users.create({
   });
 })
 .then(() => {
-  Messages.create({
+  return db.Messages.create({
     text: 'Pretty trees',
     latitude: 37.3303314,
     longitude: -122.0352186,
@@ -65,7 +62,7 @@ Users.create({
   });
 })
 .then(() => {
-  Messages.create({
+  return db.Messages.create({
     text: 'Street performers',
     latitude: 37.3323314,
     longitude: -122.0372186,
@@ -73,7 +70,7 @@ Users.create({
     UserDisplayName: 'ThomasCruise'
   });
 })
-.then(function () {
+.then(() => {
   return db.Messages.create({
     text: 'Best rootbeer!',
     latitude: 37.3313214,
@@ -84,14 +81,14 @@ Users.create({
   });
 })
 .then(() => {
-  Votes.create({
+  return db.Votes.create({
     vote: true,
     UserDisplayName: 'ThomasCruise',
     MessageId: 8
   });
 })
 .then(() => {
-  Votes.create({
+  return db.Votes.create({
     vote: false,
     UserDisplayName: 'ThomasCruise',
     MessageId: 5
