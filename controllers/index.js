@@ -35,62 +35,64 @@ module.exports = {
     },
     post: function (req, res) {
       // post delete request
-      if(!req.body.id) {
-        res.status(400);
-        res.send('id for valid message required');
-      } else if (req.body.delete === true) {
-        db.Messages.find({
-          where: {
-            id: parseInt(req.body.id)
-          }
-        })
-        .then((message)=>{
-          // find if message exists with that displayName
-          if(message && message.UserDisplayName === req.body.displayName){
-            db.Users.find({
-              where: {
-                displayName: req.body.displayName
-              }
-            }).then((user)=>{
-              if(user.userAuth === req.body.userAuth){
-                // delete message
-                db.Messages.destroy({
-                    where: {
-                      id: parseInt(req.body.id)
-                    }
-                })
-                // update totalPosts of messages author
-                .then(()=>{
-                  db.Users.find({
-                    where: {
-                      displayName: req.body.displayName
-                    }
-                  })
-                  .then((user)=>{
-                    db.Users.update({totalPosts: user.dataValues.totalPosts-1}, {
+      if (req.body.delete === true) {
+        if(!req.body.id) {
+         res.status(400);
+          res.send('id for valid message required');
+        } else {
+          db.Messages.find({
+            where: {
+              id: parseInt(req.body.id)
+            }
+          })
+          .then((message)=>{
+            // find if message exists with that displayName
+            if(message && message.UserDisplayName === req.body.displayName){
+              db.Users.find({
+                where: {
+                  displayName: req.body.displayName
+                }
+              }).then((user)=>{
+                if(user.userAuth === req.body.userAuth){
+                  // delete message
+                  db.Messages.destroy({
                       where: {
-                    displayName: req.body.displayName
+                        id: parseInt(req.body.id)
+                      }
+                  })
+                  // update totalPosts of messages author
+                  .then(()=>{
+                    db.Users.find({
+                      where: {
+                        displayName: req.body.displayName
                       }
                     })
+                    .then((user)=>{
+                      db.Users.update({totalPosts: user.dataValues.totalPosts-1}, {
+                        where: {
+                      displayName: req.body.displayName
+                        }
+                      })
+                    })
                   })
-                })
-                .then(() => {
-                res.status(200);
-                res.send('message deleted');
-                })
-              } else {
-                res.status(400);
-                res.send('userAuth wrong, users can only delete their own messages');
-              }
-            })
-          } else if (!message){
-            res.status(400);
-            res.send('message not found');
-          } else {
-            res.status(400);
-            res.send('displayName not associated with that message');
-          }
-        })
+                  .then(() => {
+                  res.status(200);
+                  res.send('message deleted');
+                  })
+                } else {
+                  res.status(400);
+                  res.send('userAuth wrong, users can only delete their own messages');
+                }
+              })
+            } else if (!message){
+              res.status(400);
+              res.send('message not found');
+            } else {
+              res.status(400);
+              res.send('displayName not associated with that message');
+            }
+          })
+        }
       // post message requires: text, lext.length, latitude, and logitude
       } else if (!req.body.text || req.body.text.length < 1 || !req.body.latitude || !req.body.longitude || !req.body.displayName) {
         res.status(406);
