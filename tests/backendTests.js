@@ -596,6 +596,7 @@ describe('API & Database', () => {
           }
         })
         .then((user) => {
+              console.log('==================b4 upvotes: ', user.dataValues.upVotes);
           expect(user.dataValues.upVotes).to.equal(0);
           expect(user.dataValues.downVotes).to.equal(0);
         })
@@ -610,7 +611,8 @@ describe('API & Database', () => {
               messageId: messageID,
               vote: true
             }
-          }, () => {
+          }, (err, res, body) => {
+                  console.log('====================body: ', body);
             // Check that the user has 1 upvote and 0 downvotes
             Models.Users.findOne({
               where: {
@@ -618,6 +620,7 @@ describe('API & Database', () => {
               }
             })
             .then((user) => {
+              console.log('====================upvotes: ', user.dataValues.upVotes);
               expect(user.dataValues.upVotes).to.equal(1);
               expect(user.dataValues.downVotes).to.equal(0);
               done();

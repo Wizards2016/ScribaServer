@@ -38,7 +38,7 @@ module.exports = {
       if (req.body.delete === true) {
         if (!req.body.id) {
           res.status(400);
-          res.send('id for valid message required');
+          res.send('id for valid message required for deleting');
         } else {
           db.Messages.find({
             where: {
@@ -121,7 +121,8 @@ module.exports = {
               longitude: req.body.longitude,
               UserDisplayName: req.body.displayName,
               category: req.body.category,
-              subCategory: req.body.subCategory
+              subCategory: req.body.subCategory,
+              readRange: req.body.readRange
             })
             // update users totalPosts
             .then(() => {
