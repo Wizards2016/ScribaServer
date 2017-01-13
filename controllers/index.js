@@ -3,7 +3,24 @@ const db = require('../db');
 module.exports = {
   messages: {
     get: (req, res) => {
-      if (req.query.latitude && req.query.longitude) {
+      // get messages from specific user
+      if (req.query.displayName){
+        db.Messages.findAll({
+          where: {
+            UserDisplayName: req.query.displayName
+          }
+        })
+        .then((data) => {
+          if (data.length > 0) {
+            res.json(data);
+          } else {
+            res.status(400);
+            res.send('no messages found for user of that displayName');
+          }
+        })
+      }
+      // get messages for given location
+      else if (req.query.latitude && req.query.longitude) {
         const latitude = parseFloat(req.query.latitude);
         const longitude = parseFloat(req.query.longitude);
         const viewDistance = parseFloat(req.query.distance) || 1;
@@ -23,6 +40,7 @@ module.exports = {
         .catch((error) => {
           console.log('error: ', error);
         });
+      // get all messages
       } else {
         db.Messages.findAll({})
         .then((data) => {
