@@ -611,7 +611,7 @@ describe('API & Database', () => {
               vote: true
             }
           }, () => {
-            setTimeout(function(){
+            setTimeout(() => {
               // Check that the user has 1 upvote and 0 downvotes
               Models.Users.findOne({
                 where: {

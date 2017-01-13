@@ -210,8 +210,8 @@ module.exports = {
             res.json(votes);
           } else {
             res.status(400);
-            res.send('no votes on record for that user messageId')
-          };
+            res.send('no votes on record for that user messageId');
+          }
         });
       // missing required query
       } else {
@@ -371,7 +371,7 @@ module.exports = {
       }
     }, //post
     get: (req, res) => {
-      if(req.query.userAuth){
+      if (req.query.userAuth) {
         db.Users.find({
           where: {
             userAuth: req.query.userAuth
@@ -385,7 +385,7 @@ module.exports = {
             res.status(400);
             res.send('user not on database');
           }
-        })
+        });
       } else {
         res.status(204);
         res.send('user display name required');
