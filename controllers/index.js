@@ -18,9 +18,8 @@ module.exports = {
             res.send('no messages found for user of that displayName');
           }
         });
-      }
       // get messages for given location
-      else if (req.query.latitude && req.query.longitude) {
+      } else if (req.query.latitude && req.query.longitude) {
         const latitude = parseFloat(req.query.latitude);
         const longitude = parseFloat(req.query.longitude);
         const viewDistance = parseFloat(req.query.distance) || 1;
@@ -40,9 +39,8 @@ module.exports = {
         .catch((error) => {
           console.log('error: ', error);
         });
-      }
       // get all messages
-      else {
+      } else {
         db.Messages.findAll({})
         .then((data) => {
           res.json(data);
