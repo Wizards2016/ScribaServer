@@ -4,7 +4,7 @@ module.exports = {
   messages: {
     get: (req, res) => {
       // get messages from specific user
-      if (req.query.displayName){
+      if (req.query.displayName) {
         db.Messages.findAll({
           where: {
             UserDisplayName: req.query.displayName
@@ -17,7 +17,7 @@ module.exports = {
             res.status(400);
             res.send('no messages found for user of that displayName');
           }
-        })
+        });
       }
       // get messages for given location
       else if (req.query.latitude && req.query.longitude) {
@@ -40,8 +40,9 @@ module.exports = {
         .catch((error) => {
           console.log('error: ', error);
         });
+      }
       // get all messages
-      } else {
+      else {
         db.Messages.findAll({})
         .then((data) => {
           res.json(data);

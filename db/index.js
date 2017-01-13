@@ -20,7 +20,7 @@ const Messages = db.define('Messages', {
     type: Sequelize.INTEGER,
     defaultValue: 0
   },
-  readRange: Sequelize.DOUBLE(12, 7),
+  readRange: Sequelize.DOUBLE(12, 7)
 });
 
 const Users = db.define('Users', {
