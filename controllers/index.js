@@ -334,43 +334,47 @@ module.exports = {
   }, // votes
   users: {
     post: (req, res) => {
-      if (!req.body.displayName || !req.body.userAuth) {
-        res.status(400);
-        res.send('userAuth and UserDisplayName requried');
-      } else {
+      // displayName and userAuth required
+      if (req.body.displayName && req.body.userAuth) {
         db.Users.find({
           where: {
             userAuth: req.body.userAuth
           }
         })
         .then((user) => {
-          if (user) {
-            res.status(400);
-            res.send('User already registered');
-          } else {
+          // if user not on Database yet
+          if (!user) {
             db.Users.find({
               where: {
                 displayName: req.body.displayName
               }
             })
             .then((user) => {
-              if (user) {
-                res.status(400);
-                res.send('User name already taken');
-              } else {
+              // if displayName available, then create new user
+              if (!user) {
                 db.Users.create({
                   displayName: req.body.displayName,
                   userAuth: req.body.userAuth
                 });
                 res.status(201);
                 res.send('New user created');
+              } else {
+                res.status(400);
+                res.send('User displayName already taken');
               }
             });
+          } else {
+            res.status(400);
+            res.send('User already registered');
           }
         });
+      } else {
+        res.status(400);
+        res.send('userAuth and UserDisplayName requried');
       }
-    }, //post
+    }, // users/post
     get: (req, res) => {
+      // userAuth required
       if (req.query.userAuth) {
         db.Users.find({
           where: {
@@ -378,6 +382,7 @@ module.exports = {
           }
         })
         .then((user) => {
+          // if user found reply with their displayName
           if (user) {
             res.status(200);
             res.json({ status: 200, displayName: user.displayName });
@@ -387,9 +392,9 @@ module.exports = {
           }
         });
       } else {
-        res.status(204);
-        res.send('user display name required');
+        res.status(400);
+        res.send('user userAuth required');
       }
-    } // get
+    } // users/get
   } // users
 };
