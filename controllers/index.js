@@ -167,16 +167,57 @@ module.exports = {
   },
   votes: {
     get: (req, res) => {
-      db.Votes.find({
-        where: {
-          UserDisplayName: req.query.displayName,
-          MessageId: parseInt(req.query.messageId, 0)
-        }
-      })
-      .then((vote) => {
-        console.log(vote);
-        res.json(vote);
-      });
+      // find a single vote
+      if (req.query.displayName && req.query.messageId) {
+        db.Votes.find({
+          where: {
+            UserDisplayName: req.query.displayName,
+            MessageId: parseInt(req.query.messageId, 0)
+          }
+        })
+        .then((vote) => {
+          if (vote) {
+            res.json(vote);
+          } else {
+            res.status(400);
+            res.send('requested vote does not exist');
+          }
+        });
+      // get all votes made by one user
+      } else if (req.query.displayName && !req.query.messageId) {
+        db.Votes.findAll({
+          where: {
+            UserDisplayName: req.query.displayName
+          }
+        })
+        .then((votes) => {
+          if (votes.length > 0) {
+            res.json(votes);
+          } else {
+            res.status(400);
+            res.send('no votes on record for that user displayName');
+          }
+        });
+      // get all votes to a message
+      } else if (req.query.messageId && !req.query.displayName) {
+        db.Votes.findAll({
+          where: {
+            MessageId: req.query.messageId
+          }
+        })
+        .then((votes) => {
+          if (votes.length > 0) {
+            res.json(votes);
+          } else {
+            res.status(400);
+            res.send('no votes on record for that user messageId');
+          }
+        });
+      // missing required query
+      } else {
+        res.status(400);
+        res.send('displayName and/or MessageId required');
+      }
     },
     post: (req, res) => {
       // validate user
@@ -328,25 +369,27 @@ module.exports = {
           }
         });
       }
-    },
+    }, //post
     get: (req, res) => {
-      db.Users.find({
-        where: {
-          userAuth: req.query.userAuth
-        }
-      })
-      .then((user) => {
-        if (!user) {
-          res.status(400);
-          res.send('user not on database');
-        } else if (user.displayName) {
-          res.status(200);
-          res.json({ status: 200, displayName: user.displayName });
-        } else {
-          res.status(204);
-          res.send('user display name required');
-        }
-      });
-    }
-  }
+      if (req.query.userAuth) {
+        db.Users.find({
+          where: {
+            userAuth: req.query.userAuth
+          }
+        })
+        .then((user) => {
+          if (user) {
+            res.status(200);
+            res.json({ status: 200, displayName: user.displayName });
+          } else {
+            res.status(400);
+            res.send('user not on database');
+          }
+        });
+      } else {
+        res.status(204);
+        res.send('user display name required');
+      }
+    } // get
+  } // users
 };
