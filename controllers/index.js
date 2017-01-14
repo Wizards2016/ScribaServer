@@ -480,12 +480,12 @@ module.exports = {
       }
     }, // users/post
     get: (req, res) => {
-      // userAuth required
-      if (req.query.userAuth) {
+      // userAuth or displayName required
+      if (req.query.userAuth || req.query.displayName) {
+        let userAuth = req.query.userAuth;
+        let displayName = req.query.displayName;
         db.Users.find({
-          where: {
-            userAuth: req.query.userAuth
-          }
+          where: ['userAuth=? or displayName=?', userAuth, displayName]
         })
         .then((user) => {
           // if user found reply with their displayName
