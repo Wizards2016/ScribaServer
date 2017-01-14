@@ -373,14 +373,16 @@ module.exports = {
                   UserDisplayName: user.displayName
                 }
               })
-              // then for each vote, adjust vote counts for those messages
+              // for each vote, adjust vote counts for those messages
               .then((votes) => {
                 if (votes.length > 0) {
+                  let upvoteDifTotal = 0;
+                  let downvoteDifTotal = 0;
                   votes.forEach((val, i) => {
                     let upvoteDif = 0;
                     let downvoteDif = 0;
                     votes[i].dataValues.vote ? (upvoteDif -= 1) : (downvoteDif -= 1);
-                    // find and update votes for the message
+                    votes[i].dataValues.vote ? (upvoteDifTotal -= 1) : (downvoteDifTotal -= 1);
                     db.Messages.find({
                       where: {
                         id: votes[i].dataValues.MessageId
@@ -406,8 +408,8 @@ module.exports = {
                       .then((author) => {
                         if (author) {
                           db.Users.update({
-                            upVotes: author.dataValues.upVotes + upvoteDif,
-                            downVotes: author.dataValues.downVotes + downvoteDif
+                            upVotes: author.dataValues.upVotes + upvoteDifTotal,
+                            downVotes: author.dataValues.downVotes + downvoteDifTotal
                           }, {
                             where: {
                               displayName: message.dataValues.UserDisplayName
@@ -424,22 +426,39 @@ module.exports = {
                     }
                   });
                 } // if votes.length
-              })
-              // delete all messages with displayName as its UserDisplayName
+              }) //then vote
+              // delete all votes for user's messages///////// / // /
               .then(() => {
-                db.Messages.destroy({
+                db.Messages.findAll({
                   where: {
                     UserDisplayName: req.body.displayName
                   }
-                });
-              })
-              // delete user by displayName from Users table
-              .then(() => {
-                db.Users.destroy({
-                  where: {
-                    displayName: req.body.displayName,
-                    userAuth: req.body.userAuth
-                  }
+                })
+                .then((messages) => {
+                  messages.forEach((val, i) => {
+                    db.Votes.destroy({
+                      where: {
+                        MessageId: messages[i].dataValues.id
+                      }
+                    })
+                  })
+                })
+                // delete all messages with displayName as its UserDisplayName
+                .then(() => {
+                  db.Messages.destroy({
+                    where: {
+                      UserDisplayName: req.body.displayName
+                    }
+                  });
+                })
+                // delete user by displayName from Users table
+                .then(() => {
+                  db.Users.destroy({
+                    where: {
+                      displayName: req.body.displayName,
+                      userAuth: req.body.userAuth
+                    }
+                  });
                 });
               });
               // response user deleted
@@ -472,7 +491,7 @@ module.exports = {
           // if user found reply with their displayName
           if (user) {
             res.status(200);
-            res.json({ status: 200, displayName: user.displayName });
+            res.json({ status: 200, displayName: user.displayName, upVotes: user.upVotes, downVotes: user.downVotes, totalPosts: user.totalPosts, createdAt: user.createdAt });
           } else {
             res.status(400);
             res.send('user not on database');
