@@ -611,18 +611,20 @@ describe('API & Database', () => {
               vote: true
             }
           }, () => {
-            // Check that the user has 1 upvote and 0 downvotes
-            Models.Users.findOne({
-              where: {
-                displayName: 'Jean Valjean'
-              }
-            })
-            .then((user) => {
-              expect(user.dataValues.upVotes).to.equal(1);
-              expect(user.dataValues.downVotes).to.equal(0);
-              done();
+            setTimeout(() => {
+              // Check that the user has 1 upvote and 0 downvotes
+              Models.Users.findOne({
+                where: {
+                  displayName: 'Jean Valjean'
+                }
+              })
+              .then((user) => {
+                expect(user.dataValues.upVotes).to.equal(1);
+                expect(user.dataValues.downVotes).to.equal(0);
+                done();
+              });
             });
-          });
+          }, 500);
         });
       });
     });

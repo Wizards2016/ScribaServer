@@ -65,6 +65,7 @@ db.Users.sync()
     text: 'Yard Sale!',
     latitude: 37.3323314,
     longitude: -122.0342186,
+    downVotes: 1,
     userAuth: 'Thomas Cruise',
     UserDisplayName: 'ThomasCruise'
   });
@@ -78,7 +79,7 @@ db.Users.sync()
 })
 .then((message) => {
   return db.Votes.create({
-    vote: true,
+    vote: false,
     UserDisplayName: 'ThomasCruise',
     MessageId: message.dataValues.id
   });
@@ -88,7 +89,6 @@ db.Users.sync()
     text: 'bus stop moved',
     latitude: 37.3303314,
     longitude: -122.0312186,
-    downVotes: 1,
     userAuth: 'Thomas Cruise',
     UserDisplayName: 'ThomasCruise'
   });

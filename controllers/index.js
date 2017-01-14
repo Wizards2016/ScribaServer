@@ -3,7 +3,23 @@ const db = require('../db');
 module.exports = {
   messages: {
     get: (req, res) => {
-      if (req.query.latitude && req.query.longitude) {
+      // get messages from specific user
+      if (req.query.displayName) {
+        db.Messages.findAll({
+          where: {
+            UserDisplayName: req.query.displayName
+          }
+        })
+        .then((data) => {
+          if (data.length > 0) {
+            res.json(data);
+          } else {
+            res.status(400);
+            res.send('no messages found for user of that displayName');
+          }
+        });
+      // get messages for given location
+      } else if (req.query.latitude && req.query.longitude) {
         const latitude = parseFloat(req.query.latitude);
         const longitude = parseFloat(req.query.longitude);
         const viewDistance = parseFloat(req.query.distance) || 1;
@@ -23,6 +39,7 @@ module.exports = {
         .catch((error) => {
           console.log('error: ', error);
         });
+      // get all messages
       } else {
         db.Messages.findAll({})
         .then((data) => {
@@ -38,7 +55,7 @@ module.exports = {
       if (req.body.delete === true) {
         if (!req.body.id) {
           res.status(400);
-          res.send('id for valid message required');
+          res.send('id for valid message required for deleting');
         } else {
           db.Messages.find({
             where: {
@@ -121,7 +138,8 @@ module.exports = {
               longitude: req.body.longitude,
               UserDisplayName: req.body.displayName,
               category: req.body.category,
-              subCategory: req.body.subCategory
+              subCategory: req.body.subCategory,
+              readRange: req.body.readRange
             })
             // update users totalPosts
             .then(() => {
@@ -149,16 +167,57 @@ module.exports = {
   },
   votes: {
     get: (req, res) => {
-      db.Votes.find({
-        where: {
-          UserDisplayName: req.query.displayName,
-          MessageId: parseInt(req.query.messageId, 0)
-        }
-      })
-      .then((vote) => {
-        console.log(vote);
-        res.json(vote);
-      });
+      // find a single vote
+      if (req.query.displayName && req.query.messageId) {
+        db.Votes.find({
+          where: {
+            UserDisplayName: req.query.displayName,
+            MessageId: parseInt(req.query.messageId, 0)
+          }
+        })
+        .then((vote) => {
+          if (vote) {
+            res.json(vote);
+          } else {
+            res.status(400);
+            res.send('requested vote does not exist');
+          }
+        });
+      // get all votes made by one user
+      } else if (req.query.displayName && !req.query.messageId) {
+        db.Votes.findAll({
+          where: {
+            UserDisplayName: req.query.displayName
+          }
+        })
+        .then((votes) => {
+          if (votes.length > 0) {
+            res.json(votes);
+          } else {
+            res.status(400);
+            res.send('no votes on record for that user displayName');
+          }
+        });
+      // get all votes to a message
+      } else if (req.query.messageId && !req.query.displayName) {
+        db.Votes.findAll({
+          where: {
+            MessageId: req.query.messageId
+          }
+        })
+        .then((votes) => {
+          if (votes.length > 0) {
+            res.json(votes);
+          } else {
+            res.status(400);
+            res.send('no votes on record for that user messageId');
+          }
+        });
+      // missing required query
+      } else {
+        res.status(400);
+        res.send('displayName and/or MessageId required');
+      }
     },
     post: (req, res) => {
       // validate user
@@ -219,6 +278,8 @@ module.exports = {
                       MessageId: req.body.messageId
                     });
                     boolVote === true ? (upvoteDif += 1) : (downvoteDif += 1);
+                    res.status(201);
+                    res.send('vote created');
                   // if vote found, then update
                   } else {
                     db.Votes.update({ vote: boolVote }, {
@@ -229,6 +290,8 @@ module.exports = {
                     });
                     vote.dataValues.vote ? (upvoteDif -= 1) : (downvoteDif -= 1);
                     boolVote ? (upvoteDif += 1) : (downvoteDif += 1);
+                    res.status(201);
+                    res.send('vote updated');
                   }
                   // update message stats
                   db.Messages.update({
@@ -239,24 +302,20 @@ module.exports = {
                       id: req.body.messageId
                     }
                   });
-                  db.Messages.find({
+                  db.Users.find({
                     where: {
-                      id: req.body.messageId
+                      displayName: message.dataValues.UserDisplayName
                     }
                   })
-                  .then((message) => {
+                  .then((author) => {
                     // update user vote totals
                     db.Users.update({
-                      upVotes: message.dataValues.upVotes + upvoteDif,
-                      downVotes: message.dataValues.downVotes + downvoteDif
+                      upVotes: author.dataValues.upVotes + upvoteDif,
+                      downVotes: author.dataValues.downVotes + downvoteDif
                     }, {
                       where: {
                         displayName: message.dataValues.UserDisplayName
                       }
-                    })
-                    .then(() => {
-                      res.status(201);
-                      res.send('vote recorded');
                     });
                   }); // then message for user stats
                 } // else !(vote && vote.dataValues.vote == boolVote)
@@ -310,25 +369,27 @@ module.exports = {
           }
         });
       }
-    },
+    }, //post
     get: (req, res) => {
-      db.Users.find({
-        where: {
-          userAuth: req.query.userAuth
-        }
-      })
-      .then((user) => {
-        if (!user) {
-          res.status(400);
-          res.send('user not on database');
-        } else if (user.displayName) {
-          res.status(200);
-          res.json({ status: 200, displayName: user.displayName });
-        } else {
-          res.status(204);
-          res.send('user display name required');
-        }
-      });
-    }
-  }
+      if (req.query.userAuth) {
+        db.Users.find({
+          where: {
+            userAuth: req.query.userAuth
+          }
+        })
+        .then((user) => {
+          if (user) {
+            res.status(200);
+            res.json({ status: 200, displayName: user.displayName });
+          } else {
+            res.status(400);
+            res.send('user not on database');
+          }
+        });
+      } else {
+        res.status(204);
+        res.send('user display name required');
+      }
+    } // get
+  } // users
 };
