@@ -39,7 +39,8 @@ db.Users.sync()
     latitude: 37.3344314,
     longitude: -122.0336186,
     userAuth: 'Thomas Cruise',
-    UserDisplayName: 'ThomasCruise'
+    UserDisplayName: 'ThomasCruise',
+    category: 'Funny'
   });
 })
 .then(() => {
@@ -48,7 +49,8 @@ db.Users.sync()
     latitude: 37.3323314,
     longitude: -122.0333786,
     userAuth: 'Thomas Cruise',
-    UserDisplayName: 'ThomasCruise'
+    UserDisplayName: 'ThomasCruise',
+    category: 'Sad'
   });
 })
 .then(() => {
@@ -57,7 +59,8 @@ db.Users.sync()
     latitude: 37.3303316,
     longitude: -122.0332196,
     userAuth: 'Thomas Cruise',
-    UserDisplayName: 'ThomasCruise'
+    UserDisplayName: 'ThomasCruise',
+    category: 'Happy'
   });
 })
 .then(() => {
@@ -67,7 +70,8 @@ db.Users.sync()
     longitude: -122.0342186,
     downVotes: 1,
     userAuth: 'Thomas Cruise',
-    UserDisplayName: 'ThomasCruise'
+    UserDisplayName: 'ThomasCruise',
+    category: 'General'
   });
 })
 .then(() => {
@@ -86,11 +90,12 @@ db.Users.sync()
 })
 .then(() => {
   return db.Messages.create({
-    text: 'bus stop moved',
+    text: 'Shhhh...hidden treasures',
     latitude: 37.3303314,
     longitude: -122.0312186,
     userAuth: 'Thomas Cruise',
-    UserDisplayName: 'ThomasCruise'
+    UserDisplayName: 'ThomasCruise',
+    category: 'Secret'
   });
 })
 .then(() => {
@@ -99,16 +104,18 @@ db.Users.sync()
     latitude: 37.3303314,
     longitude: -122.0352186,
     userAuth: 'Thomas Cruise',
-    UserDisplayName: 'ThomasCruise'
+    UserDisplayName: 'ThomasCruise',
+    category: 'Nice'
   });
 })
 .then(() => {
   return db.Messages.create({
-    text: 'Street performers',
+    text: 'Mean dog!',
     latitude: 37.3323314,
     longitude: -122.0372186,
     userAuth: 'Thomas Cruise',
-    UserDisplayName: 'ThomasCruise'
+    UserDisplayName: 'ThomasCruise',
+    category: 'Warning'
   });
 })
 .then(() => {
@@ -118,7 +125,8 @@ db.Users.sync()
     longitude: -122.0317106,
     upVotes: 1,
     userAuth: 'Thomas Cruise',
-    UserDisplayName: 'ThomasCruise'
+    UserDisplayName: 'ThomasCruise',
+    category: 'Nice'
   });
 })
 .then(() => {
