@@ -379,15 +379,15 @@ module.exports = {
                   votes.forEach((val, i) => {
                     let upvoteDif = 0;
                     let downvoteDif = 0;
-                    !!votes[i].dataValues.vote ? (upvoteDif -= 1) : (downvoteDif -= 1);
-                    //find and update votes for the message
+                    votes[i].dataValues.vote ? (upvoteDif -= 1) : (downvoteDif -= 1);
+                    // find and update votes for the message
                     db.Messages.find({
                       where: {
                         id: votes[i].dataValues.MessageId
                       }
                     })
                     .then((message) => {
-                      if(message){
+                      if (message) {
                         db.Messages.update({
                           upVotes: message.dataValues.upVotes + upvoteDif,
                           downVotes: message.dataValues.downVotes + downvoteDif
@@ -397,14 +397,14 @@ module.exports = {
                           }
                         });
                       }
-                    //find and update vote counts for the user who wrote the message
+                    // find and update vote counts for the user who wrote the message
                       db.Users.find({
                         where: {
                           displayName: message.dataValues.UserDisplayName
                         }
                       })
                       .then((author) => {
-                        if(author){
+                        if (author) {
                           db.Users.update({
                             upVotes: author.dataValues.upVotes + upvoteDif,
                             downVotes: author.dataValues.downVotes + downvoteDif
@@ -415,12 +415,12 @@ module.exports = {
                           });
                         }
                       });
-                    })
-                  }) // forEach vote
+                    });
+                  }); // forEach vote
                   // delete all votes with displayName as its UserDisplayName
                   db.Votes.destroy({
                     where: {
-                      UserDisplayName: req.body.displayName,
+                      UserDisplayName: req.body.displayName
                     }
                   });
                 } // if votes.length
@@ -441,14 +441,14 @@ module.exports = {
                     userAuth: req.body.userAuth
                   }
                 });
-              })
+              });
               // response user deleted
               res.status(200);
               res.send('user account and all of their data deleted');
             // else only users can delete their own accounts
             } else {
-            res.status(400);
-            res.send('only users can delete their own accounts');
+              res.status(400);
+              res.send('only users can delete their own accounts');
             }
           } else {
             res.status(400);
