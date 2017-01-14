@@ -334,43 +334,134 @@ module.exports = {
   }, // votes
   users: {
     post: (req, res) => {
-      if (!req.body.displayName || !req.body.userAuth) {
-        res.status(400);
-        res.send('userAuth and UserDisplayName requried');
-      } else {
+      // displayName and userAuth required
+      if (req.body.displayName && req.body.userAuth) {
         db.Users.find({
           where: {
             userAuth: req.body.userAuth
           }
         })
         .then((user) => {
-          if (user) {
-            res.status(400);
-            res.send('User already registered');
-          } else {
+          // if user is not on Database yet, then see if displayName is taken
+          if (!user) {
             db.Users.find({
               where: {
                 displayName: req.body.displayName
               }
             })
             .then((user) => {
-              if (user) {
-                res.status(400);
-                res.send('User name already taken');
-              } else {
+              // if displayName available, then create new user
+              if (!user) {
                 db.Users.create({
                   displayName: req.body.displayName,
                   userAuth: req.body.userAuth
                 });
                 res.status(201);
                 res.send('New user created');
+              } else {
+                res.status(400);
+                res.send('User displayName already taken');
               }
             });
+          // if delete user account request
+          } else if (req.body.delete === true) {
+            // if userAuth and displayName is correct, then delete and adjust all instances
+            if (req.body.displayName === user.displayName && req.body.userAuth === user.userAuth) {
+              // findAll votes from the displayName
+              db.Votes.findAll({
+                where: {
+                  UserDisplayName: user.displayName
+                }
+              })
+              // then for each vote, adjust vote counts for those messages
+              .then((votes) => {
+                if (votes.length > 0) {
+                  votes.forEach((val, i) => {
+                    let upvoteDif = 0;
+                    let downvoteDif = 0;
+                    votes[i].dataValues.vote ? (upvoteDif -= 1) : (downvoteDif -= 1);
+                    // find and update votes for the message
+                    db.Messages.find({
+                      where: {
+                        id: votes[i].dataValues.MessageId
+                      }
+                    })
+                    .then((message) => {
+                      if (message) {
+                        db.Messages.update({
+                          upVotes: message.dataValues.upVotes + upvoteDif,
+                          downVotes: message.dataValues.downVotes + downvoteDif
+                        }, {
+                          where: {
+                            id: votes[i].dataValues.MessageId
+                          }
+                        });
+                      }
+                    // find and update vote counts for the user who wrote the message
+                      db.Users.find({
+                        where: {
+                          displayName: message.dataValues.UserDisplayName
+                        }
+                      })
+                      .then((author) => {
+                        if (author) {
+                          db.Users.update({
+                            upVotes: author.dataValues.upVotes + upvoteDif,
+                            downVotes: author.dataValues.downVotes + downvoteDif
+                          }, {
+                            where: {
+                              displayName: message.dataValues.UserDisplayName
+                            }
+                          });
+                        }
+                      });
+                    });
+                  }); // forEach vote
+                  // delete all votes with displayName as its UserDisplayName
+                  db.Votes.destroy({
+                    where: {
+                      UserDisplayName: req.body.displayName
+                    }
+                  });
+                } // if votes.length
+              })
+              // delete all messages with displayName as its UserDisplayName
+              .then(() => {
+                db.Messages.destroy({
+                  where: {
+                    UserDisplayName: req.body.displayName
+                  }
+                });
+              })
+              // delete user by displayName from Users table
+              .then(() => {
+                db.Users.destroy({
+                  where: {
+                    displayName: req.body.displayName,
+                    userAuth: req.body.userAuth
+                  }
+                });
+              });
+              // response user deleted
+              res.status(200);
+              res.send('user account and all of their data deleted');
+            // else only users can delete their own accounts
+            } else {
+              res.status(400);
+              res.send('only users can delete their own accounts');
+            }
+          } else {
+            res.status(400);
+            res.send('user already registered');
           }
         });
+      } else {
+        res.status(400);
+        res.send('userAuth and UserDisplayName requried');
       }
-    }, // post
+    }, // users/post
     get: (req, res) => {
+      // userAuth required
       if (req.query.userAuth) {
         db.Users.find({
           where: {
@@ -378,6 +469,7 @@ module.exports = {
           }
         })
         .then((user) => {
+          // if user found reply with their displayName
           if (user) {
             res.status(200);
             res.json({ status: 200, displayName: user.displayName });
@@ -387,9 +479,9 @@ module.exports = {
           }
         });
       } else {
-        res.status(204);
-        res.send('user display name required');
+        res.status(400);
+        res.send('user userAuth required');
       }
-    } // get
+    } // users/get
   } // users
 };
