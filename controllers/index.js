@@ -426,7 +426,7 @@ module.exports = {
                     }
                   });
                 } // if votes.length
-              }) //then vote
+              }) // then vote
               // delete all votes for user's messages///////// / // /
               .then(() => {
                 db.Messages.findAll({
@@ -440,8 +440,8 @@ module.exports = {
                       where: {
                         MessageId: messages[i].dataValues.id
                       }
-                    })
-                  })
+                    });
+                  });
                 })
                 // delete all messages with displayName as its UserDisplayName
                 .then(() => {
@@ -482,8 +482,8 @@ module.exports = {
     get: (req, res) => {
       // userAuth or displayName required
       if (req.query.userAuth || req.query.displayName) {
-        let userAuth = req.query.userAuth;
-        let displayName = req.query.displayName;
+        const userAuth = req.query.userAuth;
+        const displayName = req.query.displayName;
         db.Users.find({
           where: ['userAuth=? or displayName=?', userAuth, displayName]
         })
@@ -491,7 +491,14 @@ module.exports = {
           // if user found reply with their displayName
           if (user) {
             res.status(200);
-            res.json({ status: 200, displayName: user.displayName, upVotes: user.upVotes, downVotes: user.downVotes, totalPosts: user.totalPosts, createdAt: user.createdAt });
+            res.json({
+              status: 200,
+              displayName: user.displayName,
+              upVotes: user.upVotes,
+              downVotes: user.downVotes,
+              totalPosts: user.totalPosts,
+              createdAt: user.createdAt
+            });
           } else {
             res.status(400);
             res.send('user not on database');
