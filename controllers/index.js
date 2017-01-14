@@ -369,7 +369,7 @@ module.exports = {
           }
         });
       }
-    }, //post
+    }, // post
     get: (req, res) => {
       if (req.query.userAuth) {
         db.Users.find({

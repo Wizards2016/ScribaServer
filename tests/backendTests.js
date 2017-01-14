@@ -360,9 +360,11 @@ describe('API & Database', () => {
   });
 
   describe('VOTES', () => {
-    let messageID;
+    let messageIDs;
 
     beforeEach((done) => {
+      messageIDs = [];
+
       Models.Votes.destroy({
         where: {}
       })
@@ -393,9 +395,36 @@ describe('API & Database', () => {
             displayName: 'Jean Valjean'
           }
         }, () => {
-          Models.Messages.findAll({})
+          Models.Messages.findAll({
+            where: {
+              text: 'My name is Jean Valjean!'
+            }
+          })
             .then((results) => {
-              messageID = results[0].id;
+              messageIDs.push(results[0].id);
+            });
+        });
+      })
+      .then(() => {
+        // Create another message
+        request({
+          method: 'POST',
+          url: messagesURL,
+          json: {
+            text: 'I order you to forgive yourself.',
+            latitude: 37.3323314,
+            longitude: -122.0342186,
+            userAuth: '24601',
+            displayName: 'Jean Valjean'
+          }
+        }, () => {
+          Models.Messages.findAll({
+            where: {
+              text: 'I order you to forgive yourself.'
+            }
+          })
+            .then((results) => {
+              messageIDs.push(results[0].id);
             })
             .then(() => {
               done();
@@ -413,7 +442,7 @@ describe('API & Database', () => {
           json: {
             displayName: 'Fantine',
             userAuth: '123456789',
-            messageId: messageID,
+            messageId: messageIDs[0],
             vote: true
           }
         }, () => {
@@ -423,15 +452,94 @@ describe('API & Database', () => {
             url: votesURL,
             qs: {
               displayName: 'Fantine',
-              messageId: messageID
+              messageId: messageIDs[0]
             }
           }, (error, response, body) => {
             const parsedBody = JSON.parse(body);
             expect(parsedBody.vote).to.equal(true);
             // Note the capitalization
-            expect(parsedBody.MessageId).to.equal(messageID);
+            expect(parsedBody.MessageId).to.equal(messageIDs[0]);
             done();
           });
+        });
+      });
+
+      it('Gets all votes made by a user', (done) => {
+        // Make a vote on a message
+        request({
+          method: 'POST',
+          url: votesURL,
+          json: {
+            displayName: 'Fantine',
+            userAuth: '123456789',
+            messageId: messageIDs[0],
+            vote: true
+          }
+        }, () => {
+          // Make another vote on a message
+          request({
+            method: 'POST',
+            url: votesURL,
+            json: {
+              displayName: 'Fantine',
+              userAuth: '123456789',
+              messageId: messageIDs[1],
+              vote: true
+            }
+          }, () => {
+            // Get all the votes made by the user
+            request({
+              method: 'GET',
+              url: votesURL,
+              qs: {
+                displayName: 'Fantine'
+              }
+            }, (error, response, body) => {
+              expect(JSON.parse(body).length).to.equal(2);
+              done();
+            });
+          });
+        });
+      });
+
+      it('Gets all votes made on a message', (done) => {
+        // Make a vote on a message
+        request({
+          method: 'POST',
+          url: votesURL,
+          json: {
+            displayName: 'Fantine',
+            userAuth: '123456789',
+            messageId: messageIDs[0],
+            vote: true
+          }
+        }, () => {
+          // Get all the votes made on the message
+          request({
+            method: 'GET',
+            url: votesURL,
+            qs: {
+              messageId: messageIDs[0]
+            }
+          }, (error, response, body) => {
+            const parsedBody = JSON.parse(body);
+            expect(parsedBody.length).to.equal(1);
+            expect(parsedBody[0].MessageId).to.equal(messageIDs[0]);
+            expect(parsedBody[0].UserDisplayName).to.equal('Fantine');
+            done();
+          });
+        });
+      });
+
+      it('Should respond with a 404 when missing a display name and/or message id', (done) => {
+        // Make a bad request
+        request({
+          method: 'GET',
+          url: votesURL
+        }, (error, response, body) => {
+          expect(response.statusCode).to.equal(400);
+          expect(body).to.equal('displayName and/or MessageId required');
+          done();
         });
       });
     });
@@ -444,7 +552,7 @@ describe('API & Database', () => {
           json: {
             displayName: 'Fantine',
             userAuth: '123456789',
-            messageId: messageID,
+            messageId: messageIDs[0],
             vote: true
           }
         }, (error, response) => {
@@ -460,7 +568,7 @@ describe('API & Database', () => {
           json: {
             displayName: 'Cosette',
             userAuth: '123456789',
-            messageId: messageID,
+            messageId: messageIDs[0],
             vote: true
           }
         }, (error, response, body) => {
@@ -478,7 +586,7 @@ describe('API & Database', () => {
           json: {
             displayName: 'Fantine',
             userAuth: '123456789',
-            messageId: messageID,
+            messageId: messageIDs[0],
             vote: true
           }
         }, () => {
@@ -495,7 +603,7 @@ describe('API & Database', () => {
                 json: {
                   displayName: 'Fantine',
                   userAuth: '123456789',
-                  messageId: messageID,
+                  messageId: messageIDs[0],
                   vote: false
                 }
               }, () => {
@@ -518,7 +626,7 @@ describe('API & Database', () => {
           json: {
             displayName: 'Fantine',
             userAuth: '123456789',
-            messageId: messageID,
+            messageId: messageIDs[0],
             vote: true
           }
         }, () => {
@@ -536,7 +644,7 @@ describe('API & Database', () => {
                   delete: true,
                   displayName: 'Fantine',
                   userAuth: '123456789',
-                  messageId: messageID
+                  messageId: messageIDs[0]
                 }
               }, () => {
                 // Check that there are no votes in the database
@@ -554,7 +662,7 @@ describe('API & Database', () => {
         // Check that the message has 0 upvotes and 0 downvotes
         Models.Messages.findOne({
           where: {
-            id: messageID
+            id: messageIDs[0]
           }
         })
         .then((message) => {
@@ -569,14 +677,14 @@ describe('API & Database', () => {
             json: {
               displayName: 'Fantine',
               userAuth: '123456789',
-              messageId: messageID,
+              messageId: messageIDs[0],
               vote: true
             }
           }, () => {
             // Check that the message has 1 upvote and 0 downvotes
             Models.Messages.findOne({
               where: {
-                id: messageID
+                id: messageIDs[0]
               }
             })
             .then((message) => {
@@ -607,7 +715,7 @@ describe('API & Database', () => {
             json: {
               displayName: 'Fantine',
               userAuth: '123456789',
-              messageId: messageID,
+              messageId: messageIDs[0],
               vote: true
             }
           }, () => {
