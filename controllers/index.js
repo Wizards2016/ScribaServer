@@ -34,7 +34,7 @@ module.exports = {
           }
         })
         .then((data) => {
-          if(data){
+          if (data) {
             res.json(data);
           } else {
             res.status(200);
@@ -45,22 +45,19 @@ module.exports = {
       } else {
         db.Messages.findAll({})
         .then((data) => {
-          if(data){
+          if (data) {
             res.json(data);
           } else {
             res.status(500);
             res.send('no messages found on database');
           }
-        })
+        });
       }
     },
     post: (req, res) => {
       // post delete request
       if (req.body.delete === true) {
-        if (!req.body.id) {
-          res.status(400);
-          res.send('id for valid message required for deleting');
-        } else {
+        if (req.body.id) {
           db.Messages.find({
             where: {
               id: parseInt(req.body.id, 0)
@@ -73,7 +70,8 @@ module.exports = {
                 where: {
                   displayName: req.body.displayName
                 }
-              }).then((user) => {
+              })
+              .then((user) => {
                 if (user.userAuth === req.body.userAuth) {
                   // delete message
                   db.Messages.destroy({
@@ -113,6 +111,9 @@ module.exports = {
               res.send('displayName not associated with that message');
             }
           });
+        } else {
+          res.status(400);
+          res.send('id for valid message required for deleting');
         }
       // post message requires: text, lext.length, latitude, and logitude
       } else if (!req.body.text ||
@@ -131,11 +132,8 @@ module.exports = {
           }
         })
         .then((user) => {
-          if (!user) {
-            res.status(400);
-            res.send('displayName and/or userAuth is incorrect');
+          if (user) {
           // create message
-          } else {
             db.Messages.create({
               text: req.body.text,
               latitude: req.body.latitude,
@@ -164,6 +162,9 @@ module.exports = {
               res.status(201);
               res.send('messsage posted');
             });
+          } else {
+            res.status(400);
+            res.send('displayName and/or userAuth is incorrect');
           }
         });
       }
@@ -252,11 +253,12 @@ module.exports = {
                 }
               })
               .then((vote) => {
+                // vote same, no change
                 if (vote && vote.dataValues.vote === req.body.vote && !req.body.delete) {
                   res.status(200);
                   res.send('vote already on record');
                 } else {
-                  // delete vote
+                  // delete vote request
                   if (req.body.delete ||
                       req.body.vote === undefined ||
                       req.body.vote === null) {
@@ -306,13 +308,13 @@ module.exports = {
                       id: req.body.messageId
                     }
                   });
+                  // update user vote totals
                   db.Users.find({
                     where: {
                       displayName: message.dataValues.UserDisplayName
                     }
                   })
                   .then((author) => {
-                    // update user vote totals
                     db.Users.update({
                       upVotes: author.dataValues.upVotes + upvoteDif,
                       downVotes: author.dataValues.downVotes + downvoteDif
