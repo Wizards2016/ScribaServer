@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Wizards2016/Scribe-Server.git"
+    "url": "https://github.com/Wizards2016/ScribaServer.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Wizards2016/Scribe-Server/issues"
+    "url": "https://github.com/Wizards2016/ScribaServer/issues"
   },
-  "homepage": "https://github.com/Wizards2016/Scribe-Server/#readme",
+  "homepage": "https://github.com/Wizards2016/ScribaServer/#readme",
   "dependencies": {
     "body-parser": "^1.15.2",
     "chai": "^3.5.0",
