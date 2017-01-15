@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/StephenOm/Scribe-Server.git"
+    "url": "https://github.com/Wizards2016/Scribe-Server.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/StephenOm/Scribe-Server/issues"
+    "url": "https://github.com/Wizards2016/Scribe-Server/issues"
   },
-  "homepage": "https://github.com/StephenOm/Scribe-Server#readme",
+  "homepage": "https://github.com/Wizards2016/Scribe-Server/#readme",
   "dependencies": {
     "body-parser": "^1.15.2",
     "chai": "^3.5.0",
