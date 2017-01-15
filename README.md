@@ -1,10 +1,10 @@
 # Scribe-Server
 
-[![Build Status](https://travis-ci.org/Wizards2016/Scribe-Server.svg?branch=master)](https://travis-ci.org/Wizards2016/Scribe-Server)
+[![Build Status](https://travis-ci.org/Wizards2016/ScribaServer.svg?branch=master)](https://travis-ci.org/Wizards2016/Scribe-Server)
 
-# Scribe-Server
+# ScribaServer
 
-> Server for Scribe mobile app.  Users post messages with GPS coordinates, up or down vote messages, delete their messages, and delete their account.
+> Server for Scriba mobile app.  Users post messages with GPS coordinates, up or down vote messages, delete their messages, and delete their account.
 
 
 ## Team
@@ -19,12 +19,11 @@
 1. [Requirements](#requirements)
 1. [Development](#development)
     1. [Installing Dependencies](#installing-dependencies)
-1. [Team](#special)
 1. [Contributing](#contributing)
 
 ## Usage
 
-> Intended to be used as the server for Scribe mobile app https://github.com/Wizards2016/Scribe
+> Intended to be used as the server for Scriba mobile app https://github.com/Wizards2016/Scriba
 
 ## Requirements
 
