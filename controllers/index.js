@@ -34,20 +34,24 @@ module.exports = {
           }
         })
         .then((data) => {
-          res.json(data);
-        })
-        .catch((error) => {
-          console.log('error: ', error);
+          if(data){
+            res.json(data);
+          } else {
+            res.status(200);
+            res.send('no messages found for that area');
+          }
         });
       // get all messages
       } else {
         db.Messages.findAll({})
         .then((data) => {
-          res.json(data);
+          if(data){
+            res.json(data);
+          } else {
+            res.status(500);
+            res.send('no messages found on database');
+          }
         })
-        .catch((error) => {
-          console.log('error: ', error);
-        });
       }
     },
     post: (req, res) => {
@@ -427,7 +431,7 @@ module.exports = {
                   });
                 } // if votes.length
               }) // then vote
-              // delete all votes for user's messages///////// / // /
+              // delete all votes for user's messages
               .then(() => {
                 db.Messages.findAll({
                   where: {
