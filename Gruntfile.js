@@ -25,7 +25,7 @@ module.exports = (grunt) => {
       database: {
         command: [
           'mysql.server start',
-          'mysql -u root -e "drop database scribedb; create database scribedb"'
+          'mysql -u root -e "drop database scribadb; create database scribadb"'
         ].join('&&')
       },
       seed: {
@@ -45,7 +45,7 @@ module.exports = (grunt) => {
     grunt.log.write(`Options:
                     grunt lint: Run eslint
                     grunt test: Run eslint, run server and database tests
-                    grunt db: Drop and create database scribedb`);
+                    grunt db: Drop and create database scribadb`);
   });
   grunt.registerTask('lint', ['eslint']);
   grunt.registerTask('test', ['eslint', 'mochaTest']);

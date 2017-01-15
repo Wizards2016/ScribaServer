@@ -1,5 +1,5 @@
 {
-  "name": "Scriba-Server",
+  "name": "ScribaServer",
   "description": "Server for Scriba mobile app.  Users post messages with GPS coordinates.",
   "repository": "https://github.com/Wizards2016/ScribaServer",
   "keywords": ["Wizards", "Scriba"]

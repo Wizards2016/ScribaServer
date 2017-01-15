@@ -6,4 +6,4 @@ install:
 services:
   - mysql
 before_script:
-  - mysql -e 'CREATE DATABASE scribedb;'
+  - mysql -e 'CREATE DATABASE scribadb;'

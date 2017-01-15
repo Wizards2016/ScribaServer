@@ -1,6 +1,6 @@
-# Scribe-Server
+# ScribaServer
 
-[![Build Status](https://travis-ci.org/Wizards2016/ScribaServer.svg?branch=master)](https://travis-ci.org/Wizards2016/Scribe-Server)
+[![Build Status](https://travis-ci.org/Wizards2016/ScribaServer.svg?branch=master)](https://travis-ci.org/Wizards2016/ScribaServer)
 
 # ScribaServer
 
@@ -43,7 +43,7 @@ From within the root directory:
 $ npm install
 $ mysql.server start
  >> $ mysql -u root -p    #(hit enter when prompted for password)
- >> $ create database Scribedb
+ >> $ create database Scribadb
 $ grunt
 ```
 
