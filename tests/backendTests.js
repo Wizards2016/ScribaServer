@@ -352,7 +352,7 @@ describe('API & Database', () => {
           }
         }, (error, response, body) => {
           expect(response.statusCode).to.equal(400);
-          expect(body).to.equal('User name already taken');
+          expect(body).to.equal('User displayName already taken');
           done();
         });
       });
