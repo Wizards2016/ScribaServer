@@ -4,14 +4,15 @@
 
 # ScribaServer
 
-> Server for Scriba mobile app.  Users post messages with GPS coordinates, up or down vote messages, delete their messages, and delete their account.
+> Server for Scriba mobile app.  Users can post messages with GPS coordinates, up or down vote messages, delete their messages, and delete their account.
 
 
 ## Team
 
   - __Product Owner__: Dan Burke
   - __Scrum Master__: Dennis Nguyen
-  - __Engineers__: Stephen Om, Cai Lu
+  - __Engineer__: Stephen Om 
+  - __Engineer__: Cai Lu
 
 ## Table of Contents
 
@@ -42,9 +43,8 @@ From within the root directory:
 ```sh
 $ npm install
 $ mysql.server start
- >> $ mysql -u root -p    #(hit enter when prompted for password)
- >> $ create database Scribadb
-$ grunt
+ $ mysql -u root -p    #(hit enter when prompted for password)
+ mysql> create database Scribadb;
 ```
 
 ## Contributing
