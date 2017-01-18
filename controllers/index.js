@@ -79,7 +79,7 @@ module.exports = {
                       id: parseInt(req.body.id, 0)
                     }
                   })
-                  // update totalPosts of messages author
+                  // update totalPosts count of the message's author
                   .then(() => {
                     db.Users.find({
                       where: {
@@ -218,7 +218,6 @@ module.exports = {
             res.send('no votes on record for that user messageId');
           }
         });
-      // missing required query
       } else {
         res.status(400);
         res.send('displayName and/or MessageId required');
@@ -323,21 +322,21 @@ module.exports = {
                         displayName: message.dataValues.UserDisplayName
                       }
                     });
-                  }); // then message for user stats
-                } // else !(vote && vote.dataValues.vote == boolVote)
-              }); // then vote
+                  });
+                }
+              });
             } else {
               res.status(400);
               res.send('message not valid');
             }
-          }); // then message
+          });
         } else {
           res.status(400);
           res.send('user not valid');
         }
-      }); // then user
-    } // posts
-  }, // votes
+      });
+    }
+  },
   users: {
     post: (req, res) => {
       // displayName and userAuth required
@@ -379,7 +378,7 @@ module.exports = {
                   UserDisplayName: user.displayName
                 }
               })
-              // for each vote, adjust vote counts for those messages
+              // for each vote, adjust vote count totals for those messages
               .then((votes) => {
                 if (votes.length > 0) {
                   let upvoteDifTotal = 0;
@@ -405,7 +404,7 @@ module.exports = {
                           }
                         });
                       }
-                    // find and update vote counts for the user who wrote the message
+                    // update vote counts totals for the user who wrote the message
                       db.Users.find({
                         where: {
                           displayName: message.dataValues.UserDisplayName
@@ -424,16 +423,16 @@ module.exports = {
                         }
                       });
                     });
-                  }); // forEach vote
+                  });
                   // delete all votes with displayName as its UserDisplayName
                   db.Votes.destroy({
                     where: {
                       UserDisplayName: req.body.displayName
                     }
                   });
-                } // if votes.length
-              }) // then vote
-              // delete all votes for user's messages
+                }
+              })
+              // delete all votes for the user's messages
               .then(() => {
                 db.Messages.findAll({
                   where: {
@@ -467,10 +466,9 @@ module.exports = {
                   });
                 });
               });
-              // response user deleted
+              // respond user deleted successfully
               res.status(200);
               res.send('user account and all of their data deleted');
-            // else only users can delete their own accounts
             } else {
               res.status(400);
               res.send('only users can delete their own accounts');
@@ -484,7 +482,7 @@ module.exports = {
         res.status(400);
         res.send('userAuth and UserDisplayName requried');
       }
-    }, // users/post
+    },
     get: (req, res) => {
       // userAuth or displayName required
       if (req.query.userAuth || req.query.displayName) {
@@ -494,7 +492,7 @@ module.exports = {
           where: ['userAuth=? or displayName=?', userAuth, displayName]
         })
         .then((user) => {
-          // if user found reply with their displayName
+          // if user found reply with their info
           if (user) {
             res.status(200);
             res.json({
@@ -514,6 +512,6 @@ module.exports = {
         res.status(400);
         res.send('user userAuth required');
       }
-    } // users/get
-  } // users
+    }
+  }
 };
