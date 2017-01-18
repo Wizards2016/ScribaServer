@@ -24,22 +24,60 @@ db.Users.sync()
     where: {}
   });
 })
+// create users
 .then(() => {
   return db.Users.create({
     displayName: 'ThomasCruise',
     userAuth: 'Thomas Cruise',
     upVotes: 1,
-    downVotes: 1,
-    totalPosts: 8
+    downVotes: 0,
+    totalPosts: 5
   });
 })
+.then(() => {
+  return db.Users.create({
+    displayName: 'LittleBilly',
+    userAuth: 'Little Billy',
+    upVotes: 0,
+    downVotes: 0,
+    totalPosts: 1
+  });
+})
+.then(() => {
+  return db.Users.create({
+    displayName: 'GerdyTheHelpful',
+    userAuth: 'Gerdy The Helpful',
+    upVotes: 1,
+    downVotes: 0,
+    totalPosts: 1
+  });
+})
+.then(() => {
+  return db.Users.create({
+    displayName: 'TheLollercopter',
+    userAuth: 'The Lollercopter',
+    upVotes: 0,
+    downVotes: 0,
+    totalPosts: 1
+  });
+})
+.then(() => {
+  return db.Users.create({
+    displayName: 'CrazyCatLady',
+    userAuth: 'Crazy Cat Lady',
+    upVotes: 0,
+    downVotes: 1,
+    totalPosts: 1
+  });
+})
+// create messages and votes
 .then(() => {
   return db.Messages.create({
     text: 'Free couch',
     latitude: 37.3344314,
     longitude: -122.0336186,
-    userAuth: 'Thomas Cruise',
-    UserDisplayName: 'ThomasCruise',
+    userAuth: 'The Lollercopter',
+    UserDisplayName: 'TheLollercopter',
     category: 'Funny'
   });
 })
@@ -48,8 +86,8 @@ db.Users.sync()
     text: 'Lost my dog :\\',
     latitude: 37.3323314,
     longitude: -122.0333786,
-    userAuth: 'Thomas Cruise',
-    UserDisplayName: 'ThomasCruise',
+    userAuth: 'Little Billy',
+    UserDisplayName: 'LittleBilly',
     category: 'Sad'
   });
 })
@@ -58,9 +96,24 @@ db.Users.sync()
     text: 'Dog found',
     latitude: 37.3303316,
     longitude: -122.0332196,
-    userAuth: 'Thomas Cruise',
-    UserDisplayName: 'ThomasCruise',
+    upVotes: 1,
+    userAuth: 'Gerdy The Helpful',
+    UserDisplayName: 'GerdyTheHelpful',
     category: 'Happy'
+  });
+})
+.then(() => {
+  return db.Messages.findOne({
+    where: {
+      text: 'Dog found'
+    }
+  });
+})
+.then((message) => {
+  return db.Votes.create({
+    vote: true,
+    UserDisplayName: 'LittleBilly',
+    MessageId: message.dataValues.id
   });
 })
 .then(() => {
@@ -69,8 +122,8 @@ db.Users.sync()
     latitude: 37.3323314,
     longitude: -122.0342186,
     downVotes: 1,
-    userAuth: 'Thomas Cruise',
-    UserDisplayName: 'ThomasCruise',
+    userAuth: 'Crazy Cat Lady',
+    UserDisplayName: 'CrazyCatLady',
     category: 'General'
   });
 })

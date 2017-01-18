@@ -11,7 +11,7 @@
 
   - __Product Owner__: Dan Burke
   - __Scrum Master__: Dennis Nguyen
-  - __Engineer__: Stephen Om 
+  - __Engineer__: Stephen Om
   - __Engineer__: Cai Lu
 
 ## Table of Contents
@@ -20,7 +20,6 @@
 1. [Requirements](#requirements)
 1. [Development](#development)
     1. [Installing Dependencies](#installing-dependencies)
-1. [Contributing](#contributing)
 
 ## Usage
 
@@ -43,11 +42,12 @@ From within the root directory:
 ```sh
 $ npm install
 $ mysql.server start
- $ mysql -u root -p    #(hit enter when prompted for password)
- mysql> create database Scribadb;
+$ mysql -u root -p    #(hit enter when prompted for password)
+  mysql> create database Scribadb;
+  mysql> use Scribadb;
+  mysql> exit;
+$ node server.js
 ```
 
-## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 
